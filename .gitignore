@@ -1,0 +1,13 @@
+   node_modules/
+   __pycache__/
+   *.pyc
+   .env
+   .env.local
+   .aws/
+   *.zip
+   *.log
+   build/
+   dist/
+   .DS_Store
+   *.pem
+   response.json
