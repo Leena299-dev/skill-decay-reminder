@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: DynamoDB tables for Skill Decay Reminder
+
+Resources:
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Users
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: Project
+          Value: SkillDecayReminder
+
+  SkillsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Skills
+      AttributeDefinitions:
+        - AttributeName: skillId
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: skillId
+          KeyType: HASH
+        - AttributeName: userId
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: userId-index
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: Project
+          Value: SkillDecayReminder
+
+  ExerciseCacheTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ExerciseCache
+      AttributeDefinitions:
+        - AttributeName: cacheKey
+          AttributeType: S
+      KeySchema:
+        - AttributeName: cacheKey
+          KeyType: HASH
+      TimeToLiveSpecification:
+        Enabled: true
+        AttributeName: expiresAt
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: Project
+          Value: SkillDecayReminder
+
+  PracticeHistoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PracticeHistory
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: completedAt
+          AttributeType: N
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: completedAt
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      Tags:
+        - Key: Project
+          Value: SkillDecayReminder
+
+Outputs:
+  UsersTableName:
+    Description: Name of the Users table
+    Value: !Ref UsersTable
+  SkillsTableName:
+    Description: Name of the Skills table
+    Value: !Ref SkillsTable
+  ExerciseCacheTableName:
+    Description: Name of the ExerciseCache table
+    Value: !Ref ExerciseCacheTable
+  PracticeHistoryTableName:
+    Description: Name of the PracticeHistory table
+    Value: !Ref PracticeHistoryTable
