@@ -27,15 +27,16 @@ An intelligent platform that prevents skill loss using forgetting curve science 
 ## Progress Tracker
 
 ### Week 1: Infrastructure
-- [x] Development environment setup
-- [x] AWS account and Kiro configuration
-- [ ] DynamoDB tables
-- [ ] Lambda functions
-- [ ] API Gateway
-- [ ] React frontend
+- [x] Development environment setup ✅
+- [x] AWS account and Kiro configuration ✅
+- [x] Budget alerts deployed ✅
+- [x] DynamoDB tables (4 tables created and tested) ✅
+- [ ] Lambda functions (Day 2)
+- [ ] API Gateway (Day 2)
+- [ ] React frontend (Day 3-4)
 
 ### Week 2: AI Integration
-- [ ] Bedrock setup
+- [ ] Bedrock Nova Micro access
 - [ ] Cache warming
 - [ ] Practice generator
 - [ ] Reminder system
