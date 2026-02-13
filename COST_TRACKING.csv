@@ -1,0 +1,2 @@
+Week,Day,Date,Service,Description,Daily_Cost,Cumulative_Cost,Budget_Remaining,Notes
+1,1,2026-02-13,DynamoDB,Created 4 tables + tested,$0.00,$0.00,$200.00,Free Tier - all tables working
