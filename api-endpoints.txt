@@ -1,0 +1,2 @@
+Users: https://2jdba4hai2.execute-api.us-east-1.amazonaws.com/prod/users
+Skills: https://2jdba4hai2.execute-api.us-east-1.amazonaws.com/prod/skills
