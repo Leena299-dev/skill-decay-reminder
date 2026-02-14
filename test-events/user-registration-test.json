@@ -1,0 +1,7 @@
+{
+  "body": "{\"email\":\"alice@example.com\",\"name\":\"Alice Johnson\",\"timezone\":\"America/New_York\"}",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "httpMethod": "POST"
+}
