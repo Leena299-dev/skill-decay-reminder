@@ -32,8 +32,8 @@ An intelligent platform that prevents skill loss using forgetting curve science 
 - [x] Budget alerts deployed ✅
 - [x] DynamoDB tables (4 tables created and tested) ✅
 - [x] Lambda functions (2 functions with full CRUD) ✅
-- [ ] API Gateway (Day 3)
-- [ ] React frontend (Day 3-4)
+- [x] API Gateway (REST API with 5 endpoints) ✅
+- [ ] React frontend (Day 4-5)
 
 ### Week 2: AI Integration
 - [ ] Bedrock Nova Micro access
