@@ -2,3 +2,5 @@ Week,Day,Date,Service,Description,Daily_Cost,Cumulative_Cost,Budget_Remaining,No
 1,1,2026-02-13,DynamoDB,Created 4 tables + tested,$0.00,$0.00,$200.00,Free Tier - all tables working
 1,2,2024-12-14,Lambda,Created 2 Lambda functions + IAM role + tested,$0.00,$0.00,$200.00,Free Tier - 1M requests/month
 1,3,2024-12-15,API Gateway,Created REST API with 5 endpoints,$0.00,$0.00,$200.00,Free Tier - 1M requests/month
+1,4,2024-12-16,Frontend,React app with Vite + user registration,$0.00,$0.00,$200.00,Local dev
+1,5,2024-12-17,Frontend,Skills dashboard + full CRUD operations,$0.00,$0.00,$200.00,Local dev - all features working
