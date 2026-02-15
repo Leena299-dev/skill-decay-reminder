@@ -10,4 +10,7 @@
    dist/
    .DS_Store
    *.pem
-   response.json
+   response.jsonfrontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
