@@ -1,22 +1,35 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: API Gateway REST API for Skill Decay Reminder application
+Description: 'API Gateway for Skill Decay Reminder - Complete with 7 endpoints'
 
 Parameters:
   UserRegistrationLambdaArn:
     Type: String
-    Description: ARN of the UserRegistration Lambda function
+    Description: ARN of UserRegistration Lambda function
+  
   SkillManagerLambdaArn:
     Type: String
-    Description: ARN of the SkillManager Lambda function
+    Description: ARN of SkillManager Lambda function
+  
+  PracticeGeneratorLambdaArn:
+    Type: String
+    Description: ARN of PracticeGenerator Lambda function
+  
+  PracticeSessionLambdaArn:
+    Type: String
+    Description: ARN of PracticeSession Lambda function
 
 Resources:
+  # REST API
   SkillDecayAPI:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: SkillDecayReminderAPI
       Description: REST API for Skill Decay Reminder application
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
 
-  # /users resource
+  # /users Resource
   UsersResource:
     Type: AWS::ApiGateway::Resource
     Properties:
@@ -24,7 +37,7 @@ Resources:
       ParentId: !GetAtt SkillDecayAPI.RootResourceId
       PathPart: users
 
-  # POST /users
+  # POST /users Method
   UsersPostMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -37,7 +50,7 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UserRegistrationLambdaArn}/invocations'
 
-  # OPTIONS /users (CORS preflight)
+  # OPTIONS /users (CORS)
   UsersOptionsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -47,6 +60,8 @@ Resources:
       AuthorizationType: NONE
       Integration:
         Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
         IntegrationResponses:
           - StatusCode: 200
             ResponseParameters:
@@ -55,8 +70,6 @@ Resources:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             ResponseTemplates:
               application/json: ''
-        RequestTemplates:
-          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseParameters:
@@ -64,7 +77,7 @@ Resources:
             method.response.header.Access-Control-Allow-Methods: true
             method.response.header.Access-Control-Allow-Origin: true
 
-  # /skills resource
+  # /skills Resource
   SkillsResource:
     Type: AWS::ApiGateway::Resource
     Properties:
@@ -72,7 +85,7 @@ Resources:
       ParentId: !GetAtt SkillDecayAPI.RootResourceId
       PathPart: skills
 
-  # POST /skills
+  # POST /skills Method
   SkillsPostMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -85,7 +98,7 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SkillManagerLambdaArn}/invocations'
 
-  # GET /skills
+  # GET /skills Method
   SkillsGetMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -98,7 +111,7 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SkillManagerLambdaArn}/invocations'
 
-  # PUT /skills
+  # PUT /skills Method
   SkillsPutMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -111,7 +124,7 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SkillManagerLambdaArn}/invocations'
 
-  # DELETE /skills
+  # DELETE /skills Method
   SkillsDeleteMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -124,7 +137,7 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SkillManagerLambdaArn}/invocations'
 
-  # OPTIONS /skills (CORS preflight)
+  # OPTIONS /skills (CORS)
   SkillsOptionsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -134,6 +147,8 @@ Resources:
       AuthorizationType: NONE
       Integration:
         Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
         IntegrationResponses:
           - StatusCode: 200
             ResponseParameters:
@@ -142,8 +157,6 @@ Resources:
               method.response.header.Access-Control-Allow-Origin: "'*'"
             ResponseTemplates:
               application/json: ''
-        RequestTemplates:
-          application/json: '{"statusCode": 200}'
       MethodResponses:
         - StatusCode: 200
           ResponseParameters:
@@ -151,14 +164,110 @@ Resources:
             method.response.header.Access-Control-Allow-Methods: true
             method.response.header.Access-Control-Allow-Origin: true
 
-  # Lambda permissions
+  # /practice Resource
+  PracticeResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ParentId: !GetAtt SkillDecayAPI.RootResourceId
+      PathPart: practice
+
+  # POST /practice Method
+  PracticePostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref PracticeResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PracticeGeneratorLambdaArn}/invocations'
+
+  # OPTIONS /practice (CORS)
+  PracticeOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref PracticeResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # /practice-session Resource
+  PracticeSessionResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ParentId: !GetAtt SkillDecayAPI.RootResourceId
+      PathPart: practice-session
+
+  # POST /practice-session Method
+  PracticeSessionPostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref PracticeSessionResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PracticeSessionLambdaArn}/invocations'
+
+  # OPTIONS /practice-session (CORS)
+  PracticeSessionOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref PracticeSessionResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # Lambda Permissions
   UserRegistrationLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref UserRegistrationLambdaArn
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*/POST/users'
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*'
 
   SkillManagerLambdaPermission:
     Type: AWS::Lambda::Permission
@@ -166,9 +275,25 @@ Resources:
       FunctionName: !Ref SkillManagerLambdaArn
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*/*/skills'
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*'
 
-  # API Deployment
+  PracticeGeneratorLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref PracticeGeneratorLambdaArn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*'
+
+  PracticeSessionLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref PracticeSessionLambdaArn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*'
+
+  # Deployment
   ApiDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
@@ -179,20 +304,35 @@ Resources:
       - SkillsPutMethod
       - SkillsDeleteMethod
       - SkillsOptionsMethod
+      - PracticePostMethod
+      - PracticeOptionsMethod
+      - PracticeSessionPostMethod
+      - PracticeSessionOptionsMethod
     Properties:
       RestApiId: !Ref SkillDecayAPI
       StageName: prod
 
 Outputs:
+  ApiUrl:
+    Description: Base URL of the API
+    Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  
   ApiId:
     Description: API Gateway ID
     Value: !Ref SkillDecayAPI
-  ApiRootUrl:
-    Description: Root URL of the API
-    Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod'
+  
   UsersEndpoint:
     Description: POST /users endpoint
     Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/users'
+  
   SkillsEndpoint:
-    Description: /skills endpoint (GET, POST, PUT, DELETE)
+    Description: Skills endpoint (GET/POST/PUT/DELETE)
     Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/skills'
+  
+  PracticeEndpoint:
+    Description: POST /practice endpoint (AI exercise generation)
+    Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/practice'
+  
+  PracticeSessionEndpoint:
+    Description: POST /practice-session endpoint (record score)
+    Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/practice-session'
