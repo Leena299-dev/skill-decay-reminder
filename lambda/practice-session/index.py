@@ -129,8 +129,14 @@ def lambda_handler(event, context):
 
         logger.info(f"Processing: userId={user_id}, skillId={skill_id}, score={score}")
 
-        # Get current skill data
-        skill_response = skills_table.get_item(Key={'skillId': skill_id})
+        # Get current skill data (composite key: skillId + userId)
+        skill_response = skills_table.get_item(
+            Key={
+                'skillId': skill_id,
+                'userId': user_id
+            }
+        )
+    
         skill = skill_response.get('Item')
 
         if not skill:
@@ -156,7 +162,7 @@ def lambda_handler(event, context):
                 'exerciseId': exercise_id,
                 'score': score,
                 'timeSpent': time_spent,
-                'completedAt': datetime.utcnow().isoformat(),
+                'completedAt': int(datetime.utcnow().timestamp()),
                 'intervalIndex': current_index,
                 'nextReminderDate': next_date,
                 'date': today
@@ -165,7 +171,10 @@ def lambda_handler(event, context):
 
         # Update Skills table with new interval
         update_response = skills_table.update_item(
-            Key={'skillId': skill_id},
+            Key={
+            'skillId': skill_id,
+            'userId': user_id
+            },
             UpdateExpression="""
                 SET lastPracticeScore = :score,
                     lastPracticeDate = :today,
