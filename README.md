@@ -216,7 +216,7 @@ skill-decay-reminder/
 **Completion:** 18% (5/28 days)
 
 ### 📅 Week 2: AI Integration (Planned)
-- [ ] Amazon Bedrock Nova Micro access
+- [x] Bedrock access verified (auto-enabled!)
 - [ ] AI-powered practice exercise generation
 - [ ] Exercise cache warming (reduce Bedrock costs)
 - [ ] Forgetting curve algorithm implementation

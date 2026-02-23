@@ -4,7 +4,7 @@ import SkillsDashboard from './pages/SkillsDashboard';
 import './App.css';
 
 function App() {
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState('b77195e1-4a68-47da-9621-e4d21f049b19');
 
   const handleRegistrationSuccess = (newUserId) => {
     setUserId(newUserId);

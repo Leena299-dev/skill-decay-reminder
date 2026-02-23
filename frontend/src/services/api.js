@@ -60,3 +60,38 @@ export const deleteSkill = async (skillId, userId) => {
     throw error.response?.data || error.message;
   }
 };
+
+// Generate AI practice exercise
+export const generateExercise = async (userId, skillId, skillName, category, proficiency) => {
+  try {
+    const response = await axios.post(`${API_URL}/practice`, {
+      userId,
+      skillId,
+      skillName,
+      category,
+      proficiency,
+      exerciseType: 'coding_challenge'
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Generate exercise error:', error);
+    throw error;
+  }
+};
+
+// Submit practice session score
+export const submitPracticeSession = async (userId, skillId, exerciseId, score, timeSpent) => {
+  try {
+    const response = await axios.post(`${API_URL}/practice-session`, {
+      userId,
+      skillId,
+      exerciseId,
+      score,
+      timeSpent
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Submit practice session error:', error);
+    throw error;
+  }
+};

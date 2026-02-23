@@ -1,0 +1,3 @@
+{
+  "body": "{\"userId\":\"test-user-123\",\"skillId\":\"skill-456\",\"skillName\":\"Python\",\"category\":\"coding\",\"proficiency\":\"intermediate\",\"exerciseType\":\"coding_challenge\"}"
+}
