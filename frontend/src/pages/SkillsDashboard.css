@@ -1,15 +1,19 @@
-.dashboard-container {
+/* Main Dashboard Container */
+.skills-dashboard {
+  width: 100%;
   min-height: 100vh;
-  background: #f5f7fa;
-  padding: 20px;
+  padding: 30px 40px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  margin: 0;
+  max-width: none;
 }
 
+/* Dashboard Header */
 .dashboard-header {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .dashboard-header h1 {
@@ -54,7 +58,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
-  margin-bottom: 30px;
+  margin-top: 20px;
 }
 
 .skill-card {
@@ -427,3 +431,196 @@
     padding: 24px;
   }
 }
+
+/* Health Badge Styles */
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.skill-header h3 {
+  margin: 0;
+  flex: 1;
+}
+
+.health-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid;
+  white-space: nowrap;
+}
+
+.health-badge.health-healthy {
+  border-color: #22c55e;
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.health-badge.health-at-risk {
+  border-color: #eab308;
+  color: #ca8a04;
+  background: #fefce8;
+}
+
+.health-badge.health-critical {
+  border-color: #ef4444;
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.health-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.health-score {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Skill Card Health Border */
+.skill-card.health-healthy {
+  border-left: 4px solid #22c55e;
+}
+
+.skill-card.health-at-risk {
+  border-left: 4px solid #eab308;
+}
+
+.skill-card.health-critical {
+  border-left: 4px solid #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+/* Portfolio Health Styles */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.portfolio-health {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 3px solid;
+  transition: all 0.3s ease;
+}
+
+.portfolio-health:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.portfolio-health.healthy {
+  border-color: #22c55e;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.portfolio-health.at-risk {
+  border-color: #eab308;
+  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+}
+
+.portfolio-health.critical {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.health-icon-large {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.health-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.health-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.health-value {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.analytics-btn {
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+}
+
+.analytics-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+  background: linear-gradient(135deg, #44a08d 0%, #4ecdc4 100%);
+}
+
+.analytics-btn:active {
+  transform: translateY(0);
+}
+
+/* Smooth Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card,
+.chart-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.4s; }

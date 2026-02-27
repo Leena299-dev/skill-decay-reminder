@@ -18,6 +18,9 @@ Parameters:
     Type: String
     Description: ARN of PracticeSession Lambda function
 
+  AnalyticsLambdaArn:   
+    Type: String        
+
 Resources:
   # REST API
   SkillDecayAPI:
@@ -308,9 +311,71 @@ Resources:
       - PracticeOptionsMethod
       - PracticeSessionPostMethod
       - PracticeSessionOptionsMethod
+      - AnalyticsGetMethod 
     Properties:
       RestApiId: !Ref SkillDecayAPI
       StageName: prod
+
+# Analytics Resource
+  AnalyticsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ParentId: !GetAtt SkillDecayAPI.RootResourceId
+      PathPart: analytics
+
+  # Analytics GET Method
+  AnalyticsGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref AnalyticsResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AnalyticsLambdaArn}/invocations'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # Analytics OPTIONS Method (CORS)
+  AnalyticsOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref AnalyticsResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # Lambda Permission for Analytics
+  AnalyticsLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AnalyticsLambdaArn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*'
 
 Outputs:
   ApiUrl:
@@ -336,3 +401,7 @@ Outputs:
   PracticeSessionEndpoint:
     Description: POST /practice-session endpoint (record score)
     Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/practice-session'
+
+  AnalyticsEndpoint:
+    Description: Analytics endpoint URL
+    Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/analytics'

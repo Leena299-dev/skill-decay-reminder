@@ -8,6 +8,43 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from boto3.dynamodb.conditions import Key
 
+def calculate_skill_health(skill):
+    """
+    Calculate health score (0-100) based on practice schedule
+    
+    100: Perfect (practiced on time)
+    80-99: Healthy (within window) 
+    60-79: At-risk (slightly overdue)
+    0-59: Critical (needs urgent attention)
+    """
+    try:
+        # Get next reminder date
+        next_reminder = skill.get('nextReminderDate')
+        if not next_reminder:
+            return 50  # No reminder set yet
+        
+        # Parse date
+        reminder_date = datetime.strptime(next_reminder, '%Y-%m-%d').date()
+        today = datetime.utcnow().date()
+        
+        # Calculate days difference
+        days_diff = (reminder_date - today).days
+        
+        # Calculate health score
+        if days_diff >= 0:
+            # Not overdue yet - perfect health
+            health = 100
+        else:
+            # Overdue - decay health
+            days_overdue = abs(days_diff)
+            health = max(0, 100 - (days_overdue * 10))
+        
+        return health
+        
+    except Exception as e:
+        print(f"Health calculation error: {e}")
+        return 50  # Default to medium health
+
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -173,6 +210,20 @@ def handle_get_skills(query_params):
         )
         
         skills = response.get('Items', [])
+        
+        # ADD HEALTH SCORE TO EACH SKILL
+        for skill in skills:
+            skill['health'] = calculate_skill_health(skill)
+            
+            # Add health status
+            health = skill['health']
+            if health >= 80:
+                skill['healthStatus'] = 'healthy'
+            elif health >= 60:
+                skill['healthStatus'] = 'at-risk'
+            else:
+                skill['healthStatus'] = 'critical'
+        
         logger.info(f"Retrieved {len(skills)} skills for userId: {user_id}")
         
         return success_response({

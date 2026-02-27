@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getSkills, createSkill, updateSkill, deleteSkill } from '../services/api';
 import './SkillsDashboard.css';
 import PracticePage from './PracticePage';
+import Analytics from './Analytics';
 
 function SkillsDashboard({ userId }) {
   const [skills, setSkills] = useState([]);
@@ -9,6 +10,7 @@ function SkillsDashboard({ userId }) {
   const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingSkill, setEditingSkill] = useState(null);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const [formData, setFormData] = useState({
     skillName: '',
     category: 'coding',
@@ -150,47 +152,85 @@ function SkillsDashboard({ userId }) {
         </div>
       </div>
     );
-  }
+  };
+
+  // Calculate overall portfolio health
+const calculatePortfolioHealth = () => {
+  if (skills.length === 0) return 0;
+  
+  const totalHealth = skills.reduce((sum, skill) => {
+    return sum + (skill.health || 0);
+  }, 0);
+  
+  return Math.round(totalHealth / skills.length);
+};
+
+const portfolioHealth = calculatePortfolioHealth();
+const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 60 ? 'at-risk' : 'critical';
 
   return (
     <div className="skills-dashboard">
       {showPractice ? (
-        // Show Practice Page
-        <div>
-          <button 
-            onClick={() => setShowPractice(null)} 
-            className="back-button"
-            style={{
-              marginBottom: '20px',
-              padding: '10px 20px',
-              background: '#f0f0f0',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}
-          >
-            ← Back to Dashboard
-          </button>
-          <PracticePage
-            userId={userId}
-            skillId={showPractice.skillId}
-            skillName={showPractice.skillName}
-            category={showPractice.category}
-            proficiency={showPractice.proficiency}
-            onComplete={handlePracticeComplete}
-          />
+  // Show Practice Page
+  <div>
+    <button 
+      onClick={() => setShowPractice(null)} 
+      className="back-button"
+      style={{
+        marginBottom: '20px',
+        padding: '10px 20px',
+        background: '#f0f0f0',
+        border: 'none',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: '500'
+      }}
+    >
+      ← Back to Dashboard
+    </button>
+    <PracticePage
+      userId={userId}
+      skillId={showPractice.skillId}
+      skillName={showPractice.skillName}
+      category={showPractice.category}
+      proficiency={showPractice.proficiency}
+      onComplete={handlePracticeComplete}
+    />
+  </div>
+) : showAnalytics ? (
+  // Show Analytics Page
+  <Analytics userId={userId} onBack={() => setShowAnalytics(false)} />
+) : (
+  // Show Dashboard
+  <>
+<div className="dashboard-header">
+  <div className="header-content">
+    <h1>My Skills</h1>
+    {skills.length > 0 && (
+      <div className={`portfolio-health ${portfolioStatus}`}>
+        <span className="health-icon-large">
+          {portfolioHealth >= 80 ? '🟢' : portfolioHealth >= 60 ? '🟡' : '🔴'}
+        </span>
+        <div className="health-info">
+          <span className="health-label">Portfolio Health</span>
+          <span className="health-value">{portfolioHealth}%</span>
         </div>
-      ) : (
-        // Show Dashboard
-        <>
-          <div className="dashboard-header">
-            <h1>My Skills</h1>
-            <button onClick={handleAddClick} className="add-skill-btn">
-              Add New Skill
-            </button>
-          </div>
+      </div>
+    )}
+  </div>
+  <div className="header-actions">
+    <button 
+      onClick={() => setShowAnalytics(!showAnalytics)} 
+      className="analytics-btn"
+    >
+      📊 {showAnalytics ? 'Dashboard' : 'Analytics'}
+    </button>
+    <button onClick={handleAddClick} className="add-skill-btn">
+      Add New Skill
+    </button>
+  </div>
+</div>
 
           {error && <div className="error-message">{error}</div>}
 
@@ -205,9 +245,19 @@ function SkillsDashboard({ userId }) {
               {skills.map((skill) => (
                 <div 
                   key={skill.skillId} 
-                  className={`skill-card importance-${skill.importance}`}
+                  className={`skill-card importance-${skill.importance} health-${skill.healthStatus || 'healthy'}`}
                 >
-                  <h3>{skill.skillName}</h3>
+                  <div className="skill-header">
+                    <h3>{skill.skillName}</h3>
+                    {skill.health !== undefined && (
+                      <div className={`health-badge health-${skill.healthStatus || 'healthy'}`}>
+                        <span className="health-icon">
+                          {skill.health >= 80 ? '🟢' : skill.health >= 60 ? '🟡' : '🔴'}
+                        </span>
+                        <span className="health-score">{skill.health}%</span>
+                      </div>
+                    )}
+                  </div>
                   <p className="skill-category">{skill.category}</p>
                   <p className="skill-proficiency">Proficiency: {skill.proficiency}</p>
                   <p className="skill-importance">Importance: {skill.importance}</p>
