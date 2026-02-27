@@ -1,0 +1,150 @@
+.heatmap-container {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+}
+
+.heatmap-container h2 {
+  color: #333;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.heatmap-subtitle {
+  color: #888;
+  font-size: 13px;
+  margin: 0 0 16px 0;
+  font-weight: 500;
+}
+
+/* Heatmap Grid */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  max-width: 420px;
+  gap: 3px;
+  margin-bottom: 20px;
+}
+
+.heatmap-day {
+  width: 100%;
+  padding-bottom: 100%;    /* Creates square aspect ratio */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+  border-radius: 3px;
+  background-clip: padding-box;
+}
+
+.heatmap-day:hover {
+  transform: scale(1.1);
+  border-color: #667eea;
+  z-index: 10;
+}
+
+.heatmap-day::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+}
+
+/* Intensity Colors */
+.heatmap-day.intensity-0 {
+  background: #f3f4f6;
+}
+
+.heatmap-day.intensity-1 {
+  background: #c7d2fe;
+}
+
+.heatmap-day.intensity-2 {
+  background: #a5b4fc;
+}
+
+.heatmap-day.intensity-3 {
+  background: #818cf8;
+}
+
+.heatmap-day.intensity-4 {
+  background: #6366f1;
+}
+
+/* Tooltip */
+.heatmap-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.heatmap-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1f2937;
+}
+
+.tooltip-date {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.tooltip-sessions {
+  font-size: 11px;
+  color: #d1d5db;
+}
+
+/* Legend */
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  justify-content: flex-end;
+  font-size: 11px;
+  color: #666;
+}
+
+/* FIX: Make legend squares small */
+.heatmap-legend .heatmap-day {
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px;
+  min-height: 12px;
+  padding-bottom: 0 !important;
+  aspect-ratio: auto;
+}
+
+.legend-label {
+  margin: 0 4px;
+  font-size: 11px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .heatmap-grid {
+    grid-template-columns: repeat(7, 1fr);
+    max-width: 350px;
+    gap: 2px;
+  }
+  
+  .heatmap-container {
+    padding: 16px;
+  }
+}

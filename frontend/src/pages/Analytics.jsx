@@ -3,6 +3,7 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, L
 import './Analytics.css';
 import StreakBadge from '../components/StreakBadge';
 import TrendIndicator from '../components/TrendIndicator';
+import PracticeHeatmap from '../components/PracticeHeatmap';
 
 function Analytics({ userId, onBack }) {
   const [analyticsData, setAnalyticsData] = useState({
@@ -12,7 +13,12 @@ function Analytics({ userId, onBack }) {
     averageScore: 82.5,
     practiceFrequency: [
       { date: '2026-02-20', sessions: 1 },
-      { date: '2026-02-23', sessions: 1 }
+      { date: '2026-02-23', sessions: 1 },
+      { date: '2026-02-23', sessions: 1 },
+      { date: '2026-02-24', sessions: 3 },
+      { date: '2026-02-25', sessions: 1 },
+      { date: '2026-02-26', sessions: 2 },
+      { date: '2026-02-27', sessions: 1 }
     ],
     practiceBySkill: [
       { skillName: 'Spanish', sessions: 2, totalTime: 30, avgScore: 82.5 }
@@ -118,6 +124,9 @@ const earnedBadges = calculateBadges();
           ))}
         </div>
       </div>
+
+      {/* Practice Heatmap */}
+      <PracticeHeatmap practiceData={analyticsData.practiceFrequency} />
 
     {/* Charts Container - Side by Side */}
     <div className="charts-container">

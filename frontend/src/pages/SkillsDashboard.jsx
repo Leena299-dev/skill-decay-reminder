@@ -5,6 +5,7 @@ import PracticePage from './PracticePage';
 import Analytics from './Analytics';
 import StreakBadge from '../components/StreakBadge';
 import TrendIndicator from '../components/TrendIndicator';
+import PracticeHeatmap from '../components/PracticeHeatmap';
 
 function SkillsDashboard({ userId }) {
   const [skills, setSkills] = useState([]);
@@ -303,8 +304,17 @@ const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 6
             </div>
           )}
 
-          {showAddForm && (
-            <div className="modal-overlay" onClick={handleCancel}>
+          {/* Mini Practice Activity */}
+          {!loading && skills.length > 0 && (
+            <div style={{ marginTop: '40px' }}>
+              <PracticeHeatmap practiceData={[
+                { date: '2026-02-20', sessions: 1 },
+                { date: '2026-02-23', sessions: 1 }
+              ]} />
+            </div>
+          )}
+
+          {showAddForm && (<div className="modal-overlay" onClick={handleCancel}>
               <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>{editingSkill ? 'Edit Skill' : 'Add New Skill'}</h2>
                 <form onSubmit={handleSubmit}>
