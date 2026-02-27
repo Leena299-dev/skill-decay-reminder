@@ -223,6 +223,18 @@ def handle_get_skills(query_params):
                 skill['healthStatus'] = 'at-risk'
             else:
                 skill['healthStatus'] = 'critical'
+
+            # Add proficiency trend (mock for now - will be real with practice data)
+            last_score = skill.get('lastPracticeScore', 0)
+            if last_score >= 80:
+                skill['trend'] = 'improving'
+                skill['trendChange'] = '+5'
+            elif last_score >= 60:
+                skill['trend'] = 'stable'
+                skill['trendChange'] = '0'
+            else:
+                skill['trend'] = 'declining'
+                skill['trendChange'] = '-3'
         
         logger.info(f"Retrieved {len(skills)} skills for userId: {user_id}")
         

@@ -1,0 +1,54 @@
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: white;
+  border: 2px solid;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.trend-indicator.small {
+  padding: 4px 8px;
+}
+
+.trend-indicator.large {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.trend-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.trend-label {
+  color: #333;
+}
+
+.trend-change {
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+/* Trend-specific backgrounds */
+.trend-indicator.improving {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+}
+
+.trend-indicator.stable {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.trend-indicator.declining {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+/* Hover effect */
+.trend-indicator:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

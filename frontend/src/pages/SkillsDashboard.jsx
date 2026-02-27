@@ -4,6 +4,7 @@ import './SkillsDashboard.css';
 import PracticePage from './PracticePage';
 import Analytics from './Analytics';
 import StreakBadge from '../components/StreakBadge';
+import TrendIndicator from '../components/TrendIndicator';
 
 function SkillsDashboard({ userId }) {
   const [skills, setSkills] = useState([]);
@@ -265,6 +266,13 @@ const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 6
                         </span>
                         <span className="health-score">{skill.health}%</span>
                       </div>
+                    )}
+                    {skill.trend && (
+                      <TrendIndicator 
+                      trend={skill.trend} 
+                      change={skill.trendChange} 
+                      size="small" 
+                      />
                     )}
                   </div>
                   <p className="skill-category">{skill.category}</p>

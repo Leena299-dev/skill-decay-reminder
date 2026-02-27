@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Analytics.css';
 import StreakBadge from '../components/StreakBadge';
+import TrendIndicator from '../components/TrendIndicator';
 
 function Analytics({ userId, onBack }) {
   const [analyticsData, setAnalyticsData] = useState({
@@ -86,6 +87,35 @@ const earnedBadges = calculateBadges();
           <StreakBadge type="30-day" earned={earnedBadges['30-day']} size="large" />
           <StreakBadge type="100-day" earned={earnedBadges['100-day']} size="large" />
           <StreakBadge type="perfect-week" earned={earnedBadges['perfect-week']} size="large" />
+        </div>
+      </div>
+
+    {/* Proficiency Trends */}
+      <div className="trends-section">
+        <h2>📈 Proficiency Trends</h2>
+        <div className="trends-grid">
+          {analyticsData.practiceBySkill.map(skill => (
+            <div key={skill.skillName} className="trend-card">
+              <div className="trend-card-header">
+                <span className="trend-skill-name">{skill.skillName}</span>
+                <TrendIndicator 
+                  trend={skill.avgScore >= 80 ? 'improving' : skill.avgScore >= 60 ? 'stable' : 'declining'}
+                  change={skill.avgScore >= 80 ? '+5' : skill.avgScore >= 60 ? '0' : '-3'}
+                  size="large"
+                />
+              </div>
+              <div className="trend-stats">
+                <div className="trend-stat">
+                  <span className="trend-stat-label">Avg Score</span>
+                  <span className="trend-stat-value">{skill.avgScore}%</span>
+                </div>
+                <div className="trend-stat">
+                  <span className="trend-stat-label">Sessions</span>
+                  <span className="trend-stat-value">{skill.sessions}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
