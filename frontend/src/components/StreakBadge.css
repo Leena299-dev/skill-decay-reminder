@@ -1,0 +1,83 @@
+.streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: white;
+  border: 3px solid;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.streak-badge.earned:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.streak-badge.locked {
+  background: #f5f5f5;
+  cursor: default;
+}
+
+/* Sizes */
+.streak-badge.small {
+  padding: 8px;
+}
+
+.streak-badge.medium {
+  padding: 12px;
+}
+
+.streak-badge.large {
+  padding: 16px;
+}
+
+.badge-icon {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.streak-badge.small .badge-icon {
+  font-size: 24px;
+}
+
+.streak-badge.large .badge-icon {
+  font-size: 48px;
+}
+
+.badge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.badge-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+.badge-description {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Animation for earning */
+.streak-badge.earned {
+  animation: badgeEarn 0.6s ease-out;
+}
+
+@keyframes badgeEarn {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}

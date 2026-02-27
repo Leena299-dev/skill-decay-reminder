@@ -3,6 +3,7 @@ import { getSkills, createSkill, updateSkill, deleteSkill } from '../services/ap
 import './SkillsDashboard.css';
 import PracticePage from './PracticePage';
 import Analytics from './Analytics';
+import StreakBadge from '../components/StreakBadge';
 
 function SkillsDashboard({ userId }) {
   const [skills, setSkills] = useState([]);
@@ -165,6 +166,11 @@ const calculatePortfolioHealth = () => {
   return Math.round(totalHealth / skills.length);
 };
 
+const calculateStreak = () => {
+  // For now, return 1 (will be real data later)
+  return 1;
+};
+
 const portfolioHealth = calculatePortfolioHealth();
 const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 60 ? 'at-risk' : 'critical';
 
@@ -204,33 +210,36 @@ const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 6
 ) : (
   // Show Dashboard
   <>
-<div className="dashboard-header">
-  <div className="header-content">
-    <h1>My Skills</h1>
-    {skills.length > 0 && (
-      <div className={`portfolio-health ${portfolioStatus}`}>
-        <span className="health-icon-large">
-          {portfolioHealth >= 80 ? '🟢' : portfolioHealth >= 60 ? '🟡' : '🔴'}
-        </span>
-        <div className="health-info">
-          <span className="health-label">Portfolio Health</span>
-          <span className="health-value">{portfolioHealth}%</span>
-        </div>
+    <div className="dashboard-header">
+      <div className="header-content">
+        <h1>My Skills</h1>
+        {skills.length > 0 && (
+          <div className={`portfolio-health ${portfolioStatus}`}>
+            <span className="health-icon-large">
+              {portfolioHealth >= 80 ? '🟢' : portfolioHealth >= 60 ? '🟡' : '🔴'}
+            </span>
+            <div className="health-info">
+              <span className="health-label">Portfolio Health</span>
+              <span className="health-value">{portfolioHealth}%</span>
+            </div>
+          </div>
+        )}
+        {skills.length > 0 && (
+          <StreakBadge type="7-day" earned={true} size="small" />
+        )}
       </div>
-    )}
-  </div>
-  <div className="header-actions">
-    <button 
-      onClick={() => setShowAnalytics(!showAnalytics)} 
-      className="analytics-btn"
-    >
-      📊 {showAnalytics ? 'Dashboard' : 'Analytics'}
-    </button>
-    <button onClick={handleAddClick} className="add-skill-btn">
-      Add New Skill
-    </button>
-  </div>
-</div>
+      <div className="header-actions">
+        <button 
+          onClick={() => setShowAnalytics(!showAnalytics)} 
+          className="analytics-btn"
+        >
+          📊 {showAnalytics ? 'Dashboard' : 'Analytics'}
+        </button>
+        <button onClick={handleAddClick} className="add-skill-btn">
+          Add New Skill
+        </button>
+      </div>
+    </div>
 
           {error && <div className="error-message">{error}</div>}
 

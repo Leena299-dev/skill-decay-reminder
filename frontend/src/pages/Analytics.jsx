@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Analytics.css';
+import StreakBadge from '../components/StreakBadge';
 
 function Analytics({ userId, onBack }) {
   const [analyticsData, setAnalyticsData] = useState({
@@ -16,7 +17,18 @@ function Analytics({ userId, onBack }) {
       { skillName: 'Spanish', sessions: 2, totalTime: 30, avgScore: 82.5 }
     ]
   });
+ // Calculate earned badges
+const calculateBadges = () => {
+  const badges = {
+    '7-day': analyticsData.streak >= 7,
+    '30-day': analyticsData.streak >= 30,
+    '100-day': analyticsData.streak >= 100,
+    'perfect-week': analyticsData.streak >= 7 && analyticsData.totalSessions >= 7
+  };
+  return badges;
+};
 
+const earnedBadges = calculateBadges();
  return (
   <div className="analytics-container">
     {/* Back Button */}
@@ -65,6 +77,17 @@ function Analytics({ userId, onBack }) {
         </div>
       </div>
     </div>
+
+    {/* Achievements Section */}
+      <div className="achievements-section">
+        <h2>🏆 Achievements</h2>
+        <div className="badges-grid">
+          <StreakBadge type="7-day" earned={earnedBadges['7-day']} size="large" />
+          <StreakBadge type="30-day" earned={earnedBadges['30-day']} size="large" />
+          <StreakBadge type="100-day" earned={earnedBadges['100-day']} size="large" />
+          <StreakBadge type="perfect-week" earned={earnedBadges['perfect-week']} size="large" />
+        </div>
+      </div>
 
     {/* Charts Container - Side by Side */}
     <div className="charts-container">
