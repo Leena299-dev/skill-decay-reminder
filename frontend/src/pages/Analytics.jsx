@@ -4,6 +4,7 @@ import './Analytics.css';
 import StreakBadge from '../components/StreakBadge';
 import TrendIndicator from '../components/TrendIndicator';
 import PracticeHeatmap from '../components/PracticeHeatmap';
+import PracticeInsights from '../components/PracticeInsights';
 
 function Analytics({ userId, onBack }) {
   const [analyticsData, setAnalyticsData] = useState({
@@ -47,6 +48,16 @@ const earnedBadges = calculateBadges();
         ← Back to Dashboard
       </button>
     </div>
+
+    {/* AI Insights */}
+    <PracticeInsights skills={[
+    { 
+        skillName: 'Spanish', 
+        nextReminderDate: '2026-03-02',
+        health: 100,
+        skillId: '1'
+    }
+    ]} />
 
     <h1>📊 Practice Analytics</h1>
     

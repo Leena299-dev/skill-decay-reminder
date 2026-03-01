@@ -6,6 +6,7 @@ import Analytics from './Analytics';
 import StreakBadge from '../components/StreakBadge';
 import TrendIndicator from '../components/TrendIndicator';
 import PracticeHeatmap from '../components/PracticeHeatmap';
+import PracticeInsights from '../components/PracticeInsights';
 
 function SkillsDashboard({ userId }) {
   const [skills, setSkills] = useState([]);
@@ -242,8 +243,12 @@ const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 6
         </button>
       </div>
     </div>
-
           {error && <div className="error-message">{error}</div>}
+
+    {/* AI Practice Insights */} 
+      {!loading && skills.length > 0 && (
+        <PracticeInsights skills={skills} />
+      )}
 
           {!loading && skills.length === 0 && (
             <div className="empty-state">
