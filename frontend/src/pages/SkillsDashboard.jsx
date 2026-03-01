@@ -7,6 +7,7 @@ import StreakBadge from '../components/StreakBadge';
 import TrendIndicator from '../components/TrendIndicator';
 import PracticeHeatmap from '../components/PracticeHeatmap';
 import PracticeInsights from '../components/PracticeInsights';
+import QuickStats from '../components/QuickStats';
 
 function SkillsDashboard({ userId }) {
   const [skills, setSkills] = useState([]);
@@ -213,9 +214,12 @@ const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 6
 ) : (
   // Show Dashboard
   <>
+    {/* NEW HEADER LAYOUT */}
     <div className="dashboard-header">
-      <div className="header-content">
+      <div className="header-top">
         <h1>My Skills</h1>
+        
+        {/* Portfolio Health Badge */}
         {skills.length > 0 && (
           <div className={`portfolio-health ${portfolioStatus}`}>
             <span className="health-icon-large">
@@ -227,37 +231,53 @@ const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 6
             </div>
           </div>
         )}
+        
+        {/* Streak Badge */}
         {skills.length > 0 && (
           <StreakBadge type="7-day" earned={true} size="small" />
         )}
+        
+        {/* Quick Stats (inline) */}
+        {skills.length > 0 && (
+          <QuickStats 
+            skills={skills} 
+            practiceData={{ streak: calculateStreak(), totalSessions: 2, averageScore: 82.5 }}
+            compact={true}
+          />
+        )}
       </div>
+      
+      {/* Action Buttons */}
       <div className="header-actions">
         <button 
           onClick={() => setShowAnalytics(!showAnalytics)} 
           className="analytics-btn"
         >
-          📊 {showAnalytics ? 'Dashboard' : 'Analytics'}
+          📊 Analytics
         </button>
         <button onClick={handleAddClick} className="add-skill-btn">
-          Add New Skill
+          + Add New Skill
         </button>
       </div>
     </div>
-          {error && <div className="error-message">{error}</div>}
 
-    {/* AI Practice Insights */} 
-      {!loading && skills.length > 0 && (
-        <PracticeInsights skills={skills} />
-      )}
+    {error && <div className="error-message">{error}</div>}
 
-          {!loading && skills.length === 0 && (
-            <div className="empty-state">
-              <p>No skills yet. Add your first skill to start tracking!</p>
-            </div>
-          )}
+    {/* Practice Insights (compact) */}
+    {!loading && skills.length > 0 && (
+      <PracticeInsights skills={skills} compact={true} />
+    )}
 
-          {!loading && skills.length > 0 && (
-            <div className="skills-grid">
+    {/* Empty State */}
+    {!loading && skills.length === 0 && (
+      <div className="empty-state">
+        <p>No skills yet. Add your first skill to start tracking!</p>
+      </div>
+    )}
+
+    {/* Skill Cards (more space!) */}
+    {!loading && skills.length > 0 && (
+      <div className="skills-grid">
               {skills.map((skill) => (
                 <div 
                   key={skill.skillId} 
@@ -305,21 +325,22 @@ const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 6
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+        ))}
+      </div>
+    )}
 
-          {/* Mini Practice Activity */}
-          {!loading && skills.length > 0 && (
-            <div style={{ marginTop: '40px' }}>
-              <PracticeHeatmap practiceData={[
-                { date: '2026-02-20', sessions: 1 },
-                { date: '2026-02-23', sessions: 1 }
-              ]} />
-            </div>
-          )}
+    {/* Practice Activity Heatmap (bottom) */}
+    {!loading && skills.length > 0 && (
+      <div className="practice-activity-section">
+        <PracticeHeatmap practiceData={[
+          { date: '2026-02-20', sessions: 1 },
+          { date: '2026-02-23', sessions: 1 }
+        ]} />
+      </div>
+    )}
 
-          {showAddForm && (<div className="modal-overlay" onClick={handleCancel}>
+    {/* Add/Edit Skill Modal */}
+    {showAddForm && (<div className="modal-overlay" onClick={handleCancel}>
               <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>{editingSkill ? 'Edit Skill' : 'Add New Skill'}</h2>
                 <form onSubmit={handleSubmit}>
@@ -399,8 +420,8 @@ const portfolioStatus = portfolioHealth >= 80 ? 'healthy' : portfolioHealth >= 6
                 </form>
               </div>
             </div>
-          )}
-        </>
+    )}
+  </>
       )}
     </div>
   );

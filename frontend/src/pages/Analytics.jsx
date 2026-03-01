@@ -5,6 +5,7 @@ import StreakBadge from '../components/StreakBadge';
 import TrendIndicator from '../components/TrendIndicator';
 import PracticeHeatmap from '../components/PracticeHeatmap';
 import PracticeInsights from '../components/PracticeInsights';
+import QuickStats from '../components/QuickStats';
 
 function Analytics({ userId, onBack }) {
   const [analyticsData, setAnalyticsData] = useState({
@@ -58,6 +59,17 @@ const earnedBadges = calculateBadges();
         skillId: '1'
     }
     ]} />
+
+    {/* Quick Stats - ADD THIS */}
+    <QuickStats 
+        skills={[{ 
+            skillName: 'Spanish', 
+            nextReminderDate: '2026-03-02',
+            health: 100,
+            skillId: '1'
+        }]} 
+        practiceData={analyticsData}
+    />
 
     <h1>📊 Practice Analytics</h1>
     
@@ -146,7 +158,7 @@ const earnedBadges = calculateBadges();
         <div className="chart-card">
           <h2>📈 Practice Frequency</h2>
           <p className="chart-subtitle">Last 30 Days</p>
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={220}>
             <LineChart data={analyticsData.practiceFrequency}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
               <XAxis 
@@ -182,7 +194,7 @@ const earnedBadges = calculateBadges();
         <div className="chart-card">
           <h2>🎯 Practice by Skill</h2>
           <p className="chart-subtitle">Sessions & Average Scores</p>
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={220}>
             <BarChart data={analyticsData.practiceBySkill}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
               <XAxis 
