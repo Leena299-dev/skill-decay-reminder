@@ -146,9 +146,32 @@ def lambda_handler(event, context):
         
         # Practice by skill
         skill_data = {}
+        skill_names_cache = {}  # Cache to avoid multiple lookups
+        
         for session in sessions:
             skill_id = session.get('skillId', 'Unknown')
-            skill_name = session.get('skillName', 'Unknown')
+            skill_name = session.get('skillName')
+            
+            # If skillName is missing, fetch it from Skills table
+            if not skill_name and skill_id != 'Unknown':
+                if skill_id not in skill_names_cache:
+                    try:
+                        skill_response = dynamodb.Table(os.environ.get('SKILLS_TABLE', 'Skills')).get_item(
+                            Key={
+                                'skillId': skill_id,
+                                'userId': user_id
+                            }
+                        )
+                        skill_item = skill_response.get('Item', {})
+                        skill_names_cache[skill_id] = skill_item.get('skillName', 'Unknown')
+                    except Exception as e:
+                        print(f"Error fetching skill name for {skill_id}: {str(e)}")
+                        skill_names_cache[skill_id] = 'Unknown'
+                
+                skill_name = skill_names_cache[skill_id]
+            
+            if not skill_name:
+                skill_name = 'Unknown'
             
             if skill_id not in skill_data:
                 skill_data[skill_id] = {

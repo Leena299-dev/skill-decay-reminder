@@ -159,6 +159,7 @@ def lambda_handler(event, context):
                 'userId': user_id,
                 'sessionId': session_id,
                 'skillId': skill_id,
+                'skillName': skill.get('skillName', 'Unknown'),  # Add skill name
                 'exerciseId': exercise_id,
                 'score': score,
                 'timeSpent': time_spent,

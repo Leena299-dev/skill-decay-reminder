@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { generateExercise, submitPracticeSession } from '../services/api';
 import './PracticePage.css';
 
+// Detect if content looks like code (has indentation, brackets, keywords)
+const isCodeContent = (content) => {
+  if (!content) return false;
+  return /[{};]|def |function |import |const |let |var |class |=>/.test(content);
+};
+
 const PracticePage = ({ userId, skillId, skillName, category, proficiency, onComplete }) => {
   const [loading, setLoading] = useState(true);
   const [exercise, setExercise] = useState(null);
@@ -10,6 +16,7 @@ const PracticePage = ({ userId, skillId, skillName, category, proficiency, onCom
   const [timeSpent, setTimeSpent] = useState(15);
   const [submitting, setSubmitting] = useState(false);
   const [showHints, setShowHints] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
     const fetchExercise = async () => {
@@ -59,12 +66,26 @@ const PracticePage = ({ userId, skillId, skillName, category, proficiency, onCom
     }
   };
 
+  const getScoreColor = (s) => {
+    if (s >= 80) return '#4caf50';
+    if (s >= 60) return '#ff9800';
+    return '#f44336';
+  };
+
+  const getScoreLabel = (s) => {
+    if (s >= 90) return '🌟 Excellent!';
+    if (s >= 80) return '✅ Great job!';
+    if (s >= 60) return '📈 Good effort';
+    if (s >= 40) return '💪 Keep practising';
+    return '🔄 Review needed';
+  };
+
   if (loading) {
     return (
       <div className="practice-page">
         <div className="loading-spinner">
           <div className="spinner"></div>
-          <p>Generating your personalized exercise...</p>
+          <p>Generating your personalised exercise...</p>
         </div>
       </div>
     );
@@ -80,6 +101,8 @@ const PracticePage = ({ userId, skillId, skillName, category, proficiency, onCom
     );
   }
 
+  const contentIsCode = isCodeContent(exercise.content);
+
   return (
     <div className="practice-page">
       <div className="exercise-card">
@@ -90,16 +113,23 @@ const PracticePage = ({ userId, skillId, skillName, category, proficiency, onCom
           <span className="time-estimate">⏱️ {exercise.estimatedTime || 15} minutes</span>
         </div>
 
+        {/* Description */}
         <div className="description-box">
           <h3>Description</h3>
           <p>{exercise.description}</p>
         </div>
 
+        {/* Problem — code vs plain text rendering */}
         <div className="content-box">
           <h3>Problem</h3>
-          <pre><code>{exercise.content}</code></pre>
+          {contentIsCode ? (
+            <pre className="code-block"><code>{exercise.content}</code></pre>
+          ) : (
+            <div className="text-content">{exercise.content}</div>
+          )}
         </div>
 
+        {/* Hints */}
         <div className="hints-section">
           <button 
             className="hints-toggle"
@@ -123,18 +153,77 @@ const PracticePage = ({ userId, skillId, skillName, category, proficiency, onCom
           )}
         </div>
 
+        {/* ✅ NEW: Show Answer Section */}
+        <div className="answer-section">
+          <button
+            className="answer-toggle"
+            onClick={() => setShowAnswer(!showAnswer)}
+            type="button"
+          >
+            {showAnswer ? '🙈 Hide Answer' : '👁️ Show Answer'}
+          </button>
+
+          {showAnswer && (
+            <div className="answer-content">
+              <div className="answer-header">
+                <span className="answer-label">✅ Model Answer</span>
+                <span className="answer-note">Use this to mark your work before scoring below</span>
+              </div>
+
+              {exercise.solution || exercise.answer ? (
+                isCodeContent(exercise.solution || exercise.answer) ? (
+                  <pre className="code-block answer-code">
+                    <code>{exercise.solution || exercise.answer}</code>
+                  </pre>
+                ) : (
+                  <div className="answer-text">{exercise.solution || exercise.answer}</div>
+                )
+              ) : (
+                <div className="answer-text answer-missing">
+                  No model answer was provided for this exercise. 
+                  Use the hints and your own knowledge to evaluate your work.
+                </div>
+              )}
+
+              <div className="self-mark-guide">
+                <h4>📋 Self-Marking Guide</h4>
+                <div className="mark-bands">
+                  <div className="band band-excellent">
+                    <span className="band-range">90–100</span>
+                    <span className="band-desc">Fully correct, great structure and detail</span>
+                  </div>
+                  <div className="band band-good">
+                    <span className="band-range">70–89</span>
+                    <span className="band-desc">Mostly correct with minor errors</span>
+                  </div>
+                  <div className="band band-ok">
+                    <span className="band-range">50–69</span>
+                    <span className="band-desc">Partially correct, key concepts understood</span>
+                  </div>
+                  <div className="band band-low">
+                    <span className="band-range">0–49</span>
+                    <span className="band-desc">Significant gaps — review the material</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {error && (
           <div className="error-banner">
             <strong>Error:</strong> {error}
           </div>
         )}
 
+        {/* Score Form */}
         <form className="score-form" onSubmit={handleSubmit}>
           <h3>Submit Your Results</h3>
           
           <div className="form-group">
             <label htmlFor="score">
-              Score: <strong>{score}</strong>
+              Score: <strong style={{ color: getScoreColor(score) }}>{score}</strong>
+              <span className="score-label-inline"> — {getScoreLabel(score)}</span>
             </label>
             <input
               type="range"
@@ -144,6 +233,7 @@ const PracticePage = ({ userId, skillId, skillName, category, proficiency, onCom
               value={score}
               onChange={(e) => setScore(Number(e.target.value))}
               disabled={submitting}
+              style={{ '--score-color': getScoreColor(score) }}
             />
             <div className="range-labels">
               <span>0</span>
@@ -179,3 +269,4 @@ const PracticePage = ({ userId, skillId, skillName, category, proficiency, onCom
 };
 
 export default PracticePage;
+

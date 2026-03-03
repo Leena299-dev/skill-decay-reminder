@@ -95,3 +95,14 @@ export const submitPracticeSession = async (userId, skillId, exerciseId, score, 
     throw error;
   }
 };
+
+// Get analytics data
+export const getAnalytics = async (userId) => {
+  try {
+    const response = await axios.get(`${API_URL}/analytics?userId=${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Get analytics error:', error);
+    throw error.response?.data || error.message;
+  }
+};

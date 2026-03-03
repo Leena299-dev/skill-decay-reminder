@@ -18,7 +18,7 @@ dynamodb = boto3.resource('dynamodb')
 cache_table = dynamodb.Table(os.environ.get('CACHE_TABLE_NAME', 'ExerciseCache'))
 
 # Bedrock model
-BEDROCK_MODEL_ID = os.environ.get('BEDROCK_MODEL_ID', 'amazon.nova-micro-v1:0')
+BEDROCK_MODEL_ID = os.environ.get('BEDROCK_MODEL_ID', 'us.amazon.nova-micro-v1:0')
 
 
 def check_cache(cache_key):
