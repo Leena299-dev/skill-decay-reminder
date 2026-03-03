@@ -1,0 +1,197 @@
+.welcome-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 32px 60px;
+}
+
+/* Hero ------------------------------------------------------------------ */
+.welcome-hero {
+  text-align: center;
+  padding: 48px 24px 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  color: white;
+  margin-bottom: 48px;
+}
+
+.welcome-hero-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.welcome-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.welcome-subtitle {
+  font-size: 16px;
+  opacity: 0.88;
+  max-width: 520px;
+  margin: 0 auto 28px;
+  line-height: 1.6;
+}
+
+.welcome-cta {
+  display: inline-block;
+  padding: 12px 28px;
+  background: white;
+  color: #667eea;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.welcome-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Sections -------------------------------------------------------------- */
+.welcome-section {
+  margin-bottom: 48px;
+}
+
+.welcome-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Steps grid ------------------------------------------------------------ */
+.steps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.step-card {
+  display: flex;
+  gap: 16px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.step-num {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.step-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.55;
+}
+
+/* Tabs guide ------------------------------------------------------------ */
+.tabs-guide-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.tab-guide-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tab-guide-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.tab-guide-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.tab-guide-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.tab-guide-summary {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+}
+
+.tab-guide-points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.tab-guide-points li {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+  padding-left: 18px;
+  position: relative;
+}
+
+.tab-guide-points li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.tab-guide-link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.tab-guide-link:hover { color: #764ba2; }
+
+/* Responsive ------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .welcome-page { padding: 24px 16px 40px; }
+  .welcome-title { font-size: 24px; }
+  .steps-grid,
+  .tabs-guide-grid { grid-template-columns: 1fr; }
+}

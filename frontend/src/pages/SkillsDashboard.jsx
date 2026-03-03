@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getSkills, createSkill, updateSkill, deleteSkill } from '../services/api';
+import { getSkills, createSkill, updateSkill, deleteSkill, getAnalytics } from '../services/api';
 import './SkillsDashboard.css';
 import PracticePage from './PracticePage';
 import Analytics from './Analytics';
@@ -20,10 +20,26 @@ function SkillsDashboard({ userId }) {
   });
   const [showPractice, setShowPractice] = useState(null);
   const [practiceStats, setPracticeStats] = useState({
-    streak: 1, totalSessions: 2, averageScore: 82.5
+    streak: 0, totalSessions: 0, averageScore: 0
   });
 
-  useEffect(() => { loadSkills(); }, [userId]);
+  useEffect(() => {
+    loadSkills();
+    loadAnalytics();
+  }, [userId]);
+
+  const loadAnalytics = async () => {
+    try {
+      const data = await getAnalytics(userId);
+      setPracticeStats({
+        streak: data.streak || 0,
+        totalSessions: data.totalSessions || 0,
+        averageScore: data.averageScore || 0,
+      });
+    } catch (err) {
+      // Non-fatal: stats stay at zero if analytics unavailable
+    }
+  };
 
   const loadSkills = async () => {
     setLoading(true); setError(null);

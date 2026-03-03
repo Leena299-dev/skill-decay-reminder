@@ -1,6 +1,6 @@
 import './QuickStats.css';
 
-function QuickStats({ skills, practiceData = { streak: 1, totalSessions: 2, averageScore: 82.5 } }) {
+function QuickStats({ skills, practiceData = {} }) {
   // Calculate stats
   const calculateStats = () => {
     const today = new Date().toISOString().split('T')[0];

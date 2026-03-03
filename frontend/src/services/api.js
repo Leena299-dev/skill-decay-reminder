@@ -3,6 +3,15 @@ import axios from 'axios';
 // Vite uses import.meta.env instead of process.env
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+export const signIn = async (email) => {
+  try {
+    const response = await axios.get(`${API_URL}/users?email=${encodeURIComponent(email)}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
 export const registerUser = async (email, name, timezone = 'UTC') => {
   try {
     const response = await axios.post(`${API_URL}/users`, {

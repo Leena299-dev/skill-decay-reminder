@@ -4,14 +4,25 @@ import AppShell from './components/AppShell';
 import './App.css';
 
 function App() {
-  const [userId, setUserId] = useState('b77195e1-4a68-47da-9621-e4d21f049b19');
+  const [userId, setUserId] = useState(null);
+  const [userName, setUserName] = useState('');
+
+  const handleAuthSuccess = (id, name = '') => {
+    setUserId(id);
+    setUserName(name);
+  };
+
+  const handleLogout = () => {
+    setUserId(null);
+    setUserName('');
+  };
 
   return (
     <div className="App">
       {!userId ? (
-        <UserRegistration onSuccess={setUserId} />
+        <UserRegistration onSuccess={handleAuthSuccess} />
       ) : (
-        <AppShell userId={userId} />
+        <AppShell userId={userId} userName={userName} onLogout={handleLogout} />
       )}
     </div>
   );

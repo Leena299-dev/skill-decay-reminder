@@ -60,17 +60,51 @@ def check_email_exists(email):
         logger.error(f"Error checking email existence: {str(e)}")
         raise
 
+def handle_sign_in(query_params):
+    """Handle GET request - look up existing user by email"""
+    email = query_params.get('email')
+
+    if not email:
+        return error_response(400, "email query parameter is required")
+
+    if not validate_email(email):
+        return error_response(400, "Invalid email format")
+
+    try:
+        response = table.scan(
+            FilterExpression=Attr('email').eq(email.lower())
+        )
+        items = response.get('Items', [])
+
+        if not items:
+            return error_response(404, "No account found with this email address")
+
+        user = items[0]
+        logger.info(f"Sign in successful for userId: {user['userId']}")
+        return success_response(200, {
+            'userId': user['userId'],
+            'name': user.get('name', ''),
+            'message': 'Sign in successful'
+        })
+
+    except Exception as e:
+        logger.error(f"Error looking up user: {str(e)}")
+        raise
+
+
 def lambda_handler(event, context):
     """
-    Lambda function handler for user registration.
-    
-    Args:
-        event: API Gateway Lambda proxy integration event
-        context: Lambda context object
-        
-    Returns:
-        dict: API Gateway response with status code, headers, and body
+    Lambda function handler for user registration and sign-in.
+
+    GET  /users?email=...  → sign in (look up userId by email)
+    POST /users            → register new user
     """
+    http_method = event.get('httpMethod', 'POST')
+
+    if http_method == 'GET':
+        query_params = event.get('queryStringParameters') or {}
+        return handle_sign_in(query_params)
+
     try:
         # Parse JSON body from API Gateway event
         if not event.get('body'):
