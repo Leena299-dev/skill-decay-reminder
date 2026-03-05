@@ -18,8 +18,16 @@ Parameters:
     Type: String
     Description: ARN of PracticeSession Lambda function
 
-  AnalyticsLambdaArn:   
-    Type: String        
+  AnalyticsLambdaArn:
+    Type: String
+
+  NotificationPreferencesLambdaArn:
+    Type: String
+    Description: ARN of NotificationPreferences Lambda function
+
+  NotificationReaderLambdaArn:
+    Type: String
+    Description: ARN of NotificationReader Lambda function (GET /notifications, PUT /notifications/read)
 
 Resources:
   # REST API
@@ -276,6 +284,181 @@ Resources:
             method.response.header.Access-Control-Allow-Methods: true
             method.response.header.Access-Control-Allow-Origin: true
 
+  # /notifications Resource
+  NotificationsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ParentId: !GetAtt SkillDecayAPI.RootResourceId
+      PathPart: notifications
+
+  # /notifications/preferences Resource
+  NotificationsPreferencesResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ParentId: !Ref NotificationsResource
+      PathPart: preferences
+
+  # GET /notifications/preferences
+  NotificationsPreferencesGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref NotificationsPreferencesResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NotificationPreferencesLambdaArn}/invocations'
+
+  # PUT /notifications/preferences
+  NotificationsPreferencesPutMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref NotificationsPreferencesResource
+      HttpMethod: PUT
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NotificationPreferencesLambdaArn}/invocations'
+
+  # OPTIONS /notifications/preferences (CORS)
+  NotificationsPreferencesOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref NotificationsPreferencesResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,PUT,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # GET /notifications
+  NotificationsGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref NotificationsResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NotificationReaderLambdaArn}/invocations'
+
+  # OPTIONS /notifications (CORS)
+  NotificationsOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref NotificationsResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # /notifications/read Resource
+  NotificationsReadResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ParentId: !Ref NotificationsResource
+      PathPart: read
+
+  # PUT /notifications/read
+  NotificationsReadPutMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref NotificationsReadResource
+      HttpMethod: PUT
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NotificationReaderLambdaArn}/invocations'
+
+  # OPTIONS /notifications/read (CORS)
+  NotificationsReadOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref SkillDecayAPI
+      ResourceId: !Ref NotificationsReadResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'PUT,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # Lambda Permission for NotificationReader
+  NotificationReaderLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref NotificationReaderLambdaArn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*'
+
+  # Lambda Permission for NotificationPreferences
+  NotificationPreferencesLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref NotificationPreferencesLambdaArn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SkillDecayAPI}/*'
+
   # Lambda Permissions
   UserRegistrationLambdaPermission:
     Type: AWS::Lambda::Permission
@@ -325,7 +508,14 @@ Resources:
       - PracticeOptionsMethod
       - PracticeSessionPostMethod
       - PracticeSessionOptionsMethod
-      - AnalyticsGetMethod 
+      - AnalyticsGetMethod
+      - NotificationsPreferencesGetMethod
+      - NotificationsPreferencesPutMethod
+      - NotificationsPreferencesOptionsMethod
+      - NotificationsGetMethod
+      - NotificationsOptionsMethod
+      - NotificationsReadPutMethod
+      - NotificationsReadOptionsMethod
     Properties:
       RestApiId: !Ref SkillDecayAPI
       StageName: prod
@@ -419,3 +609,15 @@ Outputs:
   AnalyticsEndpoint:
     Description: Analytics endpoint URL
     Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/analytics'
+
+  NotificationPreferencesEndpoint:
+    Description: Notification preferences endpoint (GET/PUT)
+    Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/notifications/preferences'
+
+  NotificationsEndpoint:
+    Description: Notifications list endpoint (GET)
+    Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/notifications'
+
+  NotificationsReadEndpoint:
+    Description: Mark notifications read endpoint (PUT)
+    Value: !Sub 'https://${SkillDecayAPI}.execute-api.${AWS::Region}.amazonaws.com/prod/notifications/read'

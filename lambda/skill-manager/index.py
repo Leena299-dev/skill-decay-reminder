@@ -5,45 +5,7 @@ import uuid
 import logging
 import os
 from datetime import datetime, timedelta
-from decimal import Decimal
 from boto3.dynamodb.conditions import Key
-
-def calculate_skill_health(skill):
-    """
-    Calculate health score (0-100) based on practice schedule
-    
-    100: Perfect (practiced on time)
-    80-99: Healthy (within window) 
-    60-79: At-risk (slightly overdue)
-    0-59: Critical (needs urgent attention)
-    """
-    try:
-        # Get next reminder date
-        next_reminder = skill.get('nextReminderDate')
-        if not next_reminder:
-            return 50  # No reminder set yet
-        
-        # Parse date
-        reminder_date = datetime.strptime(next_reminder, '%Y-%m-%d').date()
-        today = datetime.utcnow().date()
-        
-        # Calculate days difference
-        days_diff = (reminder_date - today).days
-        
-        # Calculate health score
-        if days_diff >= 0:
-            # Not overdue yet - perfect health
-            health = 100
-        else:
-            # Overdue - decay health
-            days_overdue = abs(days_diff)
-            health = max(0, 100 - (days_overdue * 10))
-        
-        return health
-        
-    except Exception as e:
-        print(f"Health calculation error: {e}")
-        return 50  # Default to medium health
 
 # Configure logging
 logger = logging.getLogger()
@@ -53,6 +15,7 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ.get('TABLE_NAME', 'Skills')
 table = dynamodb.Table(table_name)
+history_table = dynamodb.Table(os.environ.get('HISTORY_TABLE', 'PracticeHistory'))
 
 # ADD THIS HELPER FUNCTION - converts Decimal to int/float for JSON
 def decimal_to_number(obj):
@@ -210,31 +173,36 @@ def handle_get_skills(query_params):
         )
         
         skills = response.get('Items', [])
-        
-        # ADD HEALTH SCORE TO EACH SKILL
+
+        # Query all practice history for this user, group scores by skillId
+        history_response = history_table.query(
+            KeyConditionExpression=Key('userId').eq(user_id)
+        )
+        skill_scores = {}
+        for item in history_response.get('Items', []):
+            sid = str(item.get('skillId', ''))
+            score_val = item.get('score')
+            if sid and score_val is not None:
+                skill_scores.setdefault(sid, []).append(float(decimal_to_number(score_val)))
+
+        # Compute average-score health per skill
         for skill in skills:
-            skill['health'] = calculate_skill_health(skill)
-            
-            # Add health status
-            health = skill['health']
-            if health >= 80:
-                skill['healthStatus'] = 'healthy'
+            sid = skill.get('skillId', '')
+            scores = skill_scores.get(sid, [])
+            skill['totalPracticeCount'] = len(scores)
+            health = round(sum(scores) / len(scores)) if scores else 0
+            skill['health'] = health
+
+            if not scores:
+                skill['healthStatus'] = 'new'
+            elif health >= 80:
+                skill['healthStatus'] = 'excellent'
             elif health >= 60:
+                skill['healthStatus'] = 'good'
+            elif health >= 40:
                 skill['healthStatus'] = 'at-risk'
             else:
                 skill['healthStatus'] = 'critical'
-
-            # Add proficiency trend (mock for now - will be real with practice data)
-            last_score = skill.get('lastPracticeScore', 0)
-            if last_score >= 80:
-                skill['trend'] = 'improving'
-                skill['trendChange'] = '+5'
-            elif last_score >= 60:
-                skill['trend'] = 'stable'
-                skill['trendChange'] = '0'
-            else:
-                skill['trend'] = 'declining'
-                skill['trendChange'] = '-3'
         
         logger.info(f"Retrieved {len(skills)} skills for userId: {user_id}")
         

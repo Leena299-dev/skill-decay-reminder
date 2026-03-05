@@ -1,0 +1,277 @@
+.welcome-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.welcome-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.welcome-brand-icon {
+  font-size: 1.75rem;
+}
+
+.welcome-brand-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0 0 1rem;
+}
+
+.welcome-intro {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem;
+}
+
+.welcome-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.welcome-benefits li {
+  background: #f5f3ff;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.welcome-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.welcome-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.welcome-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.welcome-input:focus {
+  border-color: #667eea;
+}
+
+.welcome-error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.welcome-cta-btn {
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-top: 0.25rem;
+}
+
+.welcome-cta-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.welcome-cta-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.welcome-back-link {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.welcome-back-link:hover {
+  color: #374151;
+}
+
+/* ── Wider card for skill form + confirmation phases ── */
+.welcome-card--wide {
+  max-width: 560px;
+}
+
+/* ── Skill form: 2-col grid for the smaller fields ── */
+.welcome-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.welcome-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.welcome-select {
+  padding: 0.7rem 0.875rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #fff;
+  color: #374151;
+  transition: border-color 0.2s;
+  outline: none;
+  cursor: pointer;
+}
+
+.welcome-select:focus {
+  border-color: #667eea;
+}
+
+/* ── Action button row ── */
+.welcome-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.welcome-actions--stacked {
+  flex-direction: column;
+}
+
+.welcome-secondary-btn {
+  flex: 1;
+  padding: 0.875rem;
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.welcome-secondary-btn:hover {
+  background: #e5e7eb;
+}
+
+/* ── Success banner ── */
+.welcome-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.welcome-success-icon {
+  font-size: 1.75rem;
+  color: #16a34a;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.welcome-success-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #15803d;
+  margin: 0 0 0.2rem;
+}
+
+.welcome-success-sub {
+  font-size: 0.875rem;
+  color: #4b7c59;
+  margin: 0;
+}
+
+/* ── Added skills list ── */
+.welcome-added-skills {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.welcome-added-skill-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  background: #f5f3ff;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.welcome-added-skill-check {
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+/* ── CTA button fills full width when alone ── */
+.welcome-actions--stacked .welcome-cta-btn,
+.welcome-actions--stacked .welcome-secondary-btn {
+  width: 100%;
+  text-align: center;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .welcome-field-grid {
+    grid-template-columns: 1fr;
+  }
+}

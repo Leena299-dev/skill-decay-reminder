@@ -1,0 +1,234 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Notification system for SharpEdge - SES email reminders via EventBridge'
+
+Parameters:
+  LambdaRoleName:
+    Type: String
+    Default: SkillDecayLambdaExecutionRole
+    Description: Name of the existing Lambda IAM execution role
+
+  SenderEmail:
+    Type: String
+    Description: Verified SES sender email address (must be verified in SES sandbox)
+
+  AppUrl:
+    Type: String
+    Default: https://sharpedge.app
+    Description: Frontend application URL (used in email CTAs)
+
+Resources:
+
+  # ── DynamoDB Tables ──────────────────────────────────────────────────────
+
+  NotificationLogTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: NotificationLog
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: notificationKey
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: notificationKey
+          KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+
+  UserNotificationPreferencesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UserNotificationPreferences
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+
+  # ── Lambda Functions ─────────────────────────────────────────────────────
+
+  EmailSenderLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SkillDecay-EmailSender
+      Runtime: python3.11
+      Handler: index.lambda_handler
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LambdaRoleName}'
+      Timeout: 30
+      MemorySize: 128
+      Environment:
+        Variables:
+          SENDER_EMAIL: !Ref SenderEmail
+          APP_URL: !Ref AppUrl
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'placeholder - deploy real code'}
+
+  NotificationSchedulerLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SkillDecay-NotificationScheduler
+      Runtime: python3.11
+      Handler: index.lambda_handler
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LambdaRoleName}'
+      Timeout: 300
+      MemorySize: 256
+      Environment:
+        Variables:
+          NOTIFICATION_TABLE: !Ref NotificationLogTable
+          PREFERENCES_TABLE: !Ref UserNotificationPreferencesTable
+          USERS_TABLE: Users
+          SKILLS_TABLE: Skills
+          HISTORY_TABLE: PracticeHistory
+          EMAIL_SENDER_ARN: !GetAtt EmailSenderLambda.Arn
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'placeholder - deploy real code'}
+    DependsOn: EmailSenderLambda
+
+  NotificationReaderLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SkillDecay-NotificationReader
+      Runtime: python3.11
+      Handler: index.lambda_handler
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LambdaRoleName}'
+      Timeout: 15
+      MemorySize: 128
+      Environment:
+        Variables:
+          NOTIFICATION_TABLE: !Ref NotificationLogTable
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'placeholder - deploy real code'}
+
+  NotificationPreferencesLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SkillDecay-NotificationPreferences
+      Runtime: python3.11
+      Handler: index.lambda_handler
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${LambdaRoleName}'
+      Timeout: 15
+      MemorySize: 128
+      Environment:
+        Variables:
+          PREFERENCES_TABLE: !Ref UserNotificationPreferencesTable
+          USERS_TABLE: Users
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {'statusCode': 200, 'body': 'placeholder - deploy real code'}
+
+  # ── EventBridge Rules ────────────────────────────────────────────────────
+
+  DailyNotificationRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: SkillDecay-DailyNotifications
+      Description: Triggers daily notification check at 8am UTC
+      ScheduleExpression: 'cron(0 8 * * ? *)'
+      State: ENABLED
+      Targets:
+        - Id: NotificationSchedulerTarget
+          Arn: !GetAtt NotificationSchedulerLambda.Arn
+          Input: '{"type":"daily"}'
+
+  HourlyWeeklyCheckRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: SkillDecay-HourlyWeeklyCheck
+      Description: Triggers hourly to catch weekly digest for each timezone
+      ScheduleExpression: 'cron(0 * * * ? *)'
+      State: ENABLED
+      Targets:
+        - Id: NotificationSchedulerWeeklyTarget
+          Arn: !GetAtt NotificationSchedulerLambda.Arn
+          Input: '{"type":"weekly-check"}'
+
+  DailyRuleLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt NotificationSchedulerLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt DailyNotificationRule.Arn
+
+  HourlyRuleLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt NotificationSchedulerLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt HourlyWeeklyCheckRule.Arn
+
+  # ── IAM Policy extension ─────────────────────────────────────────────────
+
+  NotificationDynamoDBPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: SkillDecayNotificationDynamoDBAccess
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              - dynamodb:Query
+              - dynamodb:Scan
+            Resource:
+              - !GetAtt NotificationLogTable.Arn
+              - !GetAtt UserNotificationPreferencesTable.Arn
+      Roles:
+        - !Ref LambdaRoleName
+
+  LambdaInvokePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: SkillDecayEmailSenderInvoke
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+            Resource: !GetAtt EmailSenderLambda.Arn
+      Roles:
+        - !Ref LambdaRoleName
+
+Outputs:
+  NotificationSchedulerArn:
+    Description: ARN of the notification scheduler Lambda
+    Value: !GetAtt NotificationSchedulerLambda.Arn
+
+  EmailSenderArn:
+    Description: ARN of the email sender Lambda
+    Value: !GetAtt EmailSenderLambda.Arn
+
+  NotificationPreferencesArn:
+    Description: ARN of the notification preferences Lambda
+    Value: !GetAtt NotificationPreferencesLambda.Arn
+
+  NotificationReaderArn:
+    Description: ARN of the notification reader Lambda
+    Value: !GetAtt NotificationReaderLambda.Arn
+
+  NotificationLogTableName:
+    Description: DynamoDB table for notification deduplication log
+    Value: !Ref NotificationLogTable
+
+  PreferencesTableName:
+    Description: DynamoDB table for user notification preferences
+    Value: !Ref UserNotificationPreferencesTable

@@ -8,7 +8,8 @@ export const signIn = async (email) => {
     const response = await axios.get(`${API_URL}/users?email=${encodeURIComponent(email)}`);
     return response.data;
   } catch (error) {
-    throw error.response?.data || error.message;
+    const data = error.response?.data || {};
+    throw { ...data, statusCode: error.response?.status };
   }
 };
 
@@ -112,6 +113,56 @@ export const getAnalytics = async (userId) => {
     return response.data;
   } catch (error) {
     console.error('Get analytics error:', error);
+    throw error.response?.data || error.message;
+  }
+};
+
+// Get notification preferences
+export const getNotificationPreferences = async (userId) => {
+  try {
+    const response = await axios.get(`${API_URL}/notifications/preferences?userId=${encodeURIComponent(userId)}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+// Update notification preferences
+export const updateNotificationPreferences = async (userId, prefs) => {
+  try {
+    const response = await axios.put(`${API_URL}/notifications/preferences`, { userId, ...prefs });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+// Get recent notifications for the notification centre
+export const getNotifications = async (userId, limit = 20) => {
+  try {
+    const response = await axios.get(`${API_URL}/notifications?userId=${encodeURIComponent(userId)}&limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+// Mark specific notifications as read
+export const markNotificationsRead = async (userId, notificationIds) => {
+  try {
+    const response = await axios.put(`${API_URL}/notifications/read`, { userId, notificationIds });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+// Mark all notifications as read
+export const markAllNotificationsRead = async (userId) => {
+  try {
+    const response = await axios.put(`${API_URL}/notifications/read`, { userId, markAllRead: true });
+    return response.data;
+  } catch (error) {
     throw error.response?.data || error.message;
   }
 };

@@ -9,168 +9,162 @@
   flex-direction: column;
 }
 
-/* Compact Header - NEW LAYOUT */
+/* Header */
 .dashboard-header {
   background: white;
-  padding: 20px 24px;
+  padding: 16px 24px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-shrink: 0;
 }
 
-.header-top {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-.header-top h1 {
+.dashboard-header h1 {
   font-size: 28px;
   margin: 0;
   color: #333;
+}
+
+/* ===== PRIORITY PRACTICE CARD ===== */
+.priority-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 16px;
+  border-left: 4px solid #e0e0e0;
   flex-shrink: 0;
 }
 
-.header-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+.priority-card--empty {
+  border-left-color: #ccc;
+  color: #999;
 }
 
-.analytics-btn,
-.add-skill-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+.priority-card--all-clear {
+  border-left-color: #4caf50;
+  background: #f9fff9;
 }
 
-.analytics-btn {
-  background: #f0f0f0;
-  color: #333;
+.priority-card--good {
+  border-left-color: #ffc107;
 }
 
-.analytics-btn:hover {
-  background: #e0e0e0;
+.priority-card--warning {
+  border-left-color: #ff7043;
 }
 
-.add-skill-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.priority-card--danger {
+  border-left-color: #f44336;
+  background: #fff8f8;
 }
 
-.add-skill-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+.priority-card__info {
+  flex: 1;
+  min-width: 0;
 }
 
-/* Compact Portfolio Health */
-.portfolio-health {
+.priority-card__title-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: white;
-  border: 2px solid #e0e0e0;
+  margin-bottom: 4px;
 }
 
-.portfolio-health.healthy {
-  border-color: #4caf50;
-  background: #f1f8f4;
-}
-
-.portfolio-health.at-risk {
-  border-color: #ff9800;
-  background: #fff8f0;
-}
-
-.portfolio-health.critical {
-  border-color: #f44336;
-  background: #fff0f0;
-}
-
-.health-icon-large {
-  font-size: 28px;
-}
-
-.health-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.health-label {
-  font-size: 10px;
-  color: #666;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.health-value {
-  font-size: 18px;
+.priority-card__skill-name {
+  font-size: 22px;
   font-weight: 700;
   color: #333;
 }
 
-/* Compact Insights */
-.insights-container {
-  padding: 16px;
-  margin-bottom: 16px;
+.priority-card__category {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background: #f0f0f0;
+  color: #666;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.priority-card__message {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 12px 0;
+}
+
+.priority-card__health {
+  max-width: 400px;
+}
+
+.priority-card__action {
+  display: flex;
+  align-items: center;
+  margin-left: 24px;
   flex-shrink: 0;
 }
 
-/* Insights & Activity Side by Side */
-.insights-activity-container {
+.priority-practice-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  min-width: 160px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.priority-practice-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* ===== STATS ROW ===== */
+.stats-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
   margin-bottom: 20px;
   flex-shrink: 0;
 }
 
-.insights-section,
-.activity-section {
-  min-width: 0; /* Prevents overflow */
+.stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 16px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.insights-section .insights-container {
-  margin-bottom: 0;
-  height: 100%;
+.stat-icon {
+  font-size: 24px;
+  line-height: 1;
+  margin-bottom: 6px;
 }
 
-.activity-section .heatmap-container {
-  margin-bottom: 0;
-  height: 100%;
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.1;
 }
 
-.insights-container h2 {
-  font-size: 16px;
-  margin: 0 0 12px 0;
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
 }
 
-.insights-list {
-  gap: 8px;
-}
-
-.insight-card {
-  padding: 10px 12px;
-}
-
-.insight-icon {
-  font-size: 20px;
-}
-
-.insight-message {
-  font-size: 13px;
-}
-
-/* Skills Grid - No scroll, natural flow */
+/* ===== SKILLS GRID ===== */
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -178,7 +172,6 @@
   margin-bottom: 20px;
 }
 
-/* Skill Cards - Matching Analytics Trend Card Style */
 .skill-card {
   background: white;
   border-radius: 12px;
@@ -188,13 +181,29 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
+}
+
+/* NEW skill badge */
+.skill-badge-new {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .skill-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .skill-card h3 {
@@ -205,26 +214,24 @@
 }
 
 .skill-category {
-  font-size: 12px;
-  color: #666;
+  font-size: 11px;
+  color: #888;
   text-transform: uppercase;
   font-weight: 600;
-  margin: 0 0 8px 0;
+  letter-spacing: 0.5px;
 }
 
-.skill-proficiency,
-.skill-importance,
-.skill-date,
-.skill-reminder {
+.skill-days-label {
   font-size: 13px;
   color: #555;
-  margin: 4px 0;
+  margin: 0;
+  font-weight: 500;
 }
 
 .skill-card-actions {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: auto;
   padding-top: 12px;
   border-top: 1px solid #f0f0f0;
 }
@@ -268,84 +275,119 @@
   background: #fdd;
 }
 
-.health-badge {
+/* ===== ADD SKILL CARD ===== */
+.add-skill-card {
+  background: transparent;
+  border: 2px dashed #ccc;
+  box-shadow: none;
+  cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
+  justify-content: center;
+  min-height: 140px;
+  color: #999;
+  gap: 8px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.add-skill-card:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.add-skill-plus {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.add-skill-text {
+  font-size: 13px;
   font-weight: 600;
 }
 
-.health-badge.health-healthy {
+/* ===== SKILL HEALTH BAR ===== */
+.skill-health-bar-container {
+  margin: 4px 0;
+}
+
+.skill-health-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.skill-health-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 0.5px;
+}
+
+.skill-health-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skill-health-pct {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.skill-health-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.skill-health-status.status-excellent {
   background: #e8f5e9;
   color: #2e7d32;
 }
 
-.health-badge.health-at-risk {
+.skill-health-status.status-good {
   background: #fff8e1;
-  color: #e65100;
+  color: #f57f17;
 }
 
-.health-badge.health-critical {
+.skill-health-status.status-at-risk {
+  background: #fff3e0;
+  color: #bf360c;
+}
+
+.skill-health-status.status-critical {
   background: #fce4ec;
   color: #b71c1c;
 }
 
-.health-icon {
-  font-size: 14px;
+.skill-health-status.status-new {
+  background: #ede9fe;
+  color: #5b21b6;
 }
 
-.health-score {
-  font-weight: 700;
-}
-
-/* Practice Activity Section (bottom) */
-.practice-activity-section {
-  margin-top: 24px;
-  flex-shrink: 0;
-}
-
-/* Compact Heatmap */
-.heatmap-container {
-  padding: 16px;
-  margin-bottom: 0;
-  flex-shrink: 0;
-}
-
-.heatmap-container h2 {
-  font-size: 16px;
-  margin: 0 0 8px 0;
-}
-
-.heatmap-subtitle {
-  font-size: 11px;
-  margin: 0 0 12px 0;
-}
-
-.heatmap-grid {
-  margin-bottom: 12px;
-}
-
-/* Dashboard scrollbar styling */
-.skills-dashboard::-webkit-scrollbar {
-  width: 8px;
-}
-
-.skills-dashboard::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.3);
+.skill-health-bar-track {
+  height: 8px;
+  background: #f0f0f0;
   border-radius: 4px;
+  overflow: hidden;
 }
 
-.skills-dashboard::-webkit-scrollbar-thumb {
-  background: rgba(102, 126, 234, 0.5);
+.skill-health-bar-fill {
+  height: 100%;
   border-radius: 4px;
+  transition: width 0.4s ease;
 }
 
-.skills-dashboard::-webkit-scrollbar-thumb:hover {
-  background: rgba(102, 126, 234, 0.8);
-}
+.skill-health-bar-fill.status-excellent { background: #4caf50; }
+.skill-health-bar-fill.status-good      { background: #ffc107; }
+.skill-health-bar-fill.status-at-risk   { background: #ff7043; }
+.skill-health-bar-fill.status-critical  { background: #f44336; }
+.skill-health-bar-fill.status-new       { background: #ddd6fe; }
 
 /* ===== MODAL ===== */
 .modal-overlay {
@@ -371,14 +413,8 @@
 }
 
 @keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .modal-content h2 {
@@ -463,9 +499,7 @@
   background: #ebebeb;
 }
 
-/* ===== END MODAL ===== */
-
-/* Empty State */
+/* ===== MISC ===== */
 .empty-state {
   background: white;
   padding: 60px 20px;
@@ -480,7 +514,6 @@
   margin: 0;
 }
 
-/* Error Message */
 .error-message {
   background: #fee;
   border: 1px solid #fcc;
@@ -491,39 +524,39 @@
   font-size: 14px;
 }
 
-/* Responsive adjustments */
+/* Dashboard scrollbar */
+.skills-dashboard::-webkit-scrollbar { width: 8px; }
+.skills-dashboard::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); border-radius: 4px; }
+.skills-dashboard::-webkit-scrollbar-thumb { background: rgba(102,126,234,0.5); border-radius: 4px; }
+.skills-dashboard::-webkit-scrollbar-thumb:hover { background: rgba(102,126,234,0.8); }
+
+/* Responsive */
 @media (max-width: 768px) {
   .skills-dashboard {
     padding: 15px;
   }
-  
-  .header-top {
+
+  .priority-card {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
   }
-  
-  .header-top h1 {
-    font-size: 24px;
-  }
-  
-  .header-actions {
+
+  .priority-card__action {
+    margin-left: 0;
+    margin-top: 16px;
     width: 100%;
   }
-  
-  .analytics-btn,
-  .add-skill-btn {
-    flex: 1;
+
+  .priority-practice-btn {
+    width: 100%;
   }
-  
+
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .skills-grid {
     grid-template-columns: 1fr;
-  }
-  
-  /* Stack insights and activity on mobile */
-  .insights-activity-container {
-    grid-template-columns: 1fr;
-    gap: 16px;
   }
 
   .modal-content {

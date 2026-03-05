@@ -1,234 +1,342 @@
-/* Force single page view */
+/* ══════════════════════════════════════════════════════════
+   Analytics page — full redesign
+   All classes prefixed with "an-" to avoid dashboard conflicts
+   ══════════════════════════════════════════════════════════ */
+
 .analytics-container {
   width: 100%;
   height: 100vh;
   overflow-y: auto;
   padding: 20px 30px;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
 }
 
-.analytics-container h1 {
-  color: #333;
-  margin-bottom: 16px;
+/* ── Page header ─────────────────────────────────────────── */
+.an-page-header h1 {
   font-size: 28px;
   font-weight: 700;
+  color: #333;
+  margin: 0;
 }
 
-/* Compact Back Button */
-.analytics-header {
-  margin-bottom: 12px;
+/* ── Loading ─────────────────────────────────────────────── */
+.an-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
 }
 
-.back-to-dashboard-btn {
-  padding: 8px 16px;
+/* ── Shared card ─────────────────────────────────────────── */
+.an-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  min-width: 0;
+}
+
+.an-card--full {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.an-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 4px;
+}
+
+.an-card-subtitle {
+  font-size: 12px;
+  color: #888;
+  margin: 0 0 16px;
+}
+
+.an-empty {
+  color: #9ca3af;
   font-size: 14px;
+  margin: 8px 0 0;
 }
 
-/* Compact Insights */
-.analytics-container .insights-container {
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-/* Compact Stats Grid */
-.stats-grid {
+/* ── Section 1: Learning Snapshot ────────────────────────── */
+.an-stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: 16px;
 }
 
-.stat-card {
-  padding: 16px;
+.an-stat-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  text-align: center;
 }
 
-.stat-icon {
-  font-size: 32px;
-}
-
-.stat-value {
+.an-stat-icon {
   font-size: 28px;
+  line-height: 1;
+  margin-bottom: 8px;
 }
 
-.stat-label {
-  font-size: 11px;
-}
-
-/* Achievements & Activity Side by Side */
-.achievements-activity-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.achievements-activity-container .achievements-section,
-.achievements-activity-container .activity-section {
-  min-width: 0;
-}
-
-.achievements-activity-container .achievements-section {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.achievements-activity-container .activity-section .heatmap-container {
-  margin-bottom: 0;
-  height: 100%;
-}
-
-/* Compact Achievements */
-.achievements-section {
-  margin-bottom: 16px;
-}
-
-.achievements-section h2 {
-  font-size: 18px;
-  margin: 0 0 16px 0;
-  color: #333;
-}
-
-.badges-grid {
-  gap: 12px;
-}
-
-/* Compact Trends */
-.trends-section {
-  margin-bottom: 16px;
-}
-
-.trends-section h2 {
-  font-size: 18px;
-  margin-bottom: 12px;
-}
-
-.trends-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.trend-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 20px;
-  min-width: 0;
-}
-
-.trend-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.trend-skill-name {
-  font-size: 18px;
+.an-stat-value {
+  font-size: 28px;
   font-weight: 700;
   color: #333;
+  line-height: 1.1;
 }
 
-.trend-stats {
-  display: flex;
-  gap: 20px;
+.an-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
 }
 
-.trend-stat {
+/* ── Section 2: Two-column layout ────────────────────────── */
+.an-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Variant: both columns stretch to the same height */
+.an-two-col--stretch {
+  align-items: stretch;
+}
+
+/* Left column: stacks cards vertically */
+.an-left-col {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-.trend-stat-label {
-  font-size: 12px;
-  color: #666;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-
-.trend-stat-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #667eea;
-}
-
-/* Compact Charts */
-.charts-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-bottom: 16px;
-}
-
-.chart-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 20px;
   min-width: 0;
 }
 
-.chart-card h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
+/* ── Skill Health List ───────────────────────────────────── */
+.an-health-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
 }
 
-.chart-subtitle {
+.an-health-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.an-health-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  width: 110px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.an-health-bar-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.an-health-bar-track {
+  flex: 1;
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.an-health-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.an-health-bar-fill.status-excellent { background: #4caf50; }
+.an-health-bar-fill.status-good      { background: #ffc107; }
+.an-health-bar-fill.status-at-risk   { background: #ff7043; }
+.an-health-bar-fill.status-critical  { background: #f44336; }
+.an-health-bar-fill.status-new       { background: #ddd6fe; }
+
+.an-health-pct {
   font-size: 12px;
-  margin: -8px 0 12px 0;
+  font-weight: 700;
+  color: #555;
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
 }
 
-/* Reduce chart height */
-.charts-container .recharts-responsive-container {
-  max-height: 220px !important;
+.an-health-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  flex-shrink: 0;
 }
 
-/* Compact scrollbar */
-.analytics-container::-webkit-scrollbar {
-  width: 8px;
+.an-health-badge.status-excellent { background: #e8f5e9; color: #2e7d32; }
+.an-health-badge.status-good      { background: #fff8e1; color: #f57f17; }
+.an-health-badge.status-at-risk   { background: #fff3e0; color: #bf360c; }
+.an-health-badge.status-critical  { background: #fce4ec; color: #b71c1c; }
+.an-health-badge.status-new       { background: #ede9fe; color: #5b21b6; }
+
+/* ── Heatmap column: fill container, remove fixed width ──── */
+.an-heatmap-col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.analytics-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+.an-heatmap-col .heatmap-container {
+  flex: 1;
+  margin-bottom: 0;
+  box-sizing: border-box;
 }
 
-.analytics-container::-webkit-scrollbar-thumb {
-  background: rgba(102, 126, 234, 0.5);
-  border-radius: 4px;
+.an-heatmap-col .heatmap-grid {
+  max-width: 100%;
 }
 
-.analytics-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(102, 126, 234, 0.8);
+/* ── Section 3: Forgetting Curve Risk ───────────────────── */
+.an-risk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
+.an-risk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
 
-/* Responsive adjustments */
+.an-risk-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  width: 140px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.an-risk-days {
+  font-size: 12px;
+  color: #6b7280;
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.an-risk-bar-track {
+  flex: 1;
+  height: 10px;
+  background: #f0f0f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.an-risk-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.an-risk-label {
+  font-size: 11px;
+  font-weight: 700;
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* ── Section 5: Achievements ─────────────────────────────── */
+.an-badges-earned {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.an-badges-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.an-badges-empty-msg {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.an-badges-locked-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0.5;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+.analytics-container::-webkit-scrollbar { width: 8px; }
+.analytics-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); border-radius: 4px; }
+.analytics-container::-webkit-scrollbar-thumb { background: rgba(102,126,234,0.5); border-radius: 4px; }
+.analytics-container::-webkit-scrollbar-thumb:hover { background: rgba(102,126,234,0.8); }
+
+.an-health-list::-webkit-scrollbar { width: 4px; }
+.an-health-list::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px; }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .an-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .an-two-col--stretch {
+    align-items: start;
+  }
+}
+
 @media (max-width: 768px) {
   .analytics-container {
     padding: 15px;
   }
 
-  .stats-grid {
+  .an-stats-row {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  /* Stack achievements and activity on mobile */
-  .achievements-activity-container {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .charts-container {
-    grid-template-columns: 1fr;
-  }
+  .an-risk-name  { width: 100px; }
+  .an-risk-days  { width: 80px;  }
+  .an-risk-label { width: 70px;  }
 }
 
 @media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .an-stats-row {
+    grid-template-columns: 1fr 1fr;
   }
+
+  .an-risk-days { display: none; }
 }
