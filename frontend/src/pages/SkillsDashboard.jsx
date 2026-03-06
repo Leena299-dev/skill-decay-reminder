@@ -191,7 +191,8 @@ function SkillsDashboard({ userId, autoOpenAddModal, onAddModalOpened, autoOpenP
             ← Back to Dashboard
           </button>
           <PracticePage userId={userId} skillId={showPractice.skillId} skillName={showPractice.skillName}
-            category={showPractice.category} proficiency={showPractice.proficiency} onComplete={handlePracticeComplete} />
+            category={showPractice.category} proficiency={showPractice.proficiency}
+            adaptiveDifficulty={showPractice.adaptiveDifficulty} onComplete={handlePracticeComplete} />
         </div>
       ) : (
         <>
@@ -304,6 +305,11 @@ function SkillsDashboard({ userId, autoOpenAddModal, onAddModalOpened, autoOpenP
                       <h3>{skill.skillName}</h3>
                       <span className="skill-category">{skill.category}</span>
                     </div>
+                    {skill.adaptiveDifficulty && (
+                      <span className={`skill-difficulty-badge skill-difficulty-badge--${skill.adaptiveDifficulty.split('_')[0]}`}>
+                        {skill.adaptiveDifficulty.replace('_', ' ')}
+                      </span>
+                    )}
                     <div className="skill-health-bar-container">
                       <div className="skill-health-bar-header">
                         <span className="skill-health-label">Avg Score</span>

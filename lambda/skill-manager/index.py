@@ -39,6 +39,13 @@ VALID_PROFICIENCY = ['beginner', 'intermediate', 'advanced', 'expert']
 VALID_IMPORTANCE = ['low', 'medium', 'high', 'critical']
 FORGETTING_CURVE_INTERVALS = [1, 3, 7, 14, 30, 60]
 
+PROFICIENCY_TO_DIFFICULTY = {
+    'beginner': 'beginner_medium',
+    'intermediate': 'intermediate_medium',
+    'advanced': 'advanced_medium',
+    'expert': 'advanced_hard',
+}
+
 def success_response(data, status_code=200):
     return {
         'statusCode': status_code,
@@ -146,7 +153,10 @@ def handle_create_skill(body):
         'createdAt': datetime.utcnow().isoformat(),
         'nextReminderDate': next_reminder_date,
         'currentIntervalIndex': 0,
-        'lastPracticeScore': 0
+        'lastPracticeScore': 0,
+        'adaptiveDifficulty': PROFICIENCY_TO_DIFFICULTY.get(proficiency, 'intermediate_medium'),
+        'recentScores': [],
+        'showMoreHints': False,
     }
     
     # Store in DynamoDB

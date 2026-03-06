@@ -64,6 +64,20 @@
   color: #666;
 }
 
+/* Live auto-timer in exercise meta */
+.exercise-timer {
+  margin-left: auto;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  transition: color 0.5s;
+  padding: 6px 14px;
+  background: #f8f8f8;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+}
+
 /* Description */
 .description-box {
   background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
@@ -440,6 +454,204 @@
   cursor: not-allowed;
 }
 
+/* Timer display row in score form */
+.timer-display-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.timer-display-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.timer-display-value {
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  transition: color 0.5s;
+}
+
+.timer-display-estimate {
+  font-size: 13px;
+  color: #999;
+}
+
+/* ===== DIFFICULTY BADGE ===== */
+.difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1.5px solid;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* ===== HINTS TOGGLE ACTIVE STATE + BADGE ===== */
+.hints-toggle--active {
+  background: #fff8e1;
+  border-color: #f0e68c;
+}
+
+.hints-badge {
+  margin-left: 10px;
+  background: #ff9800;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ===== COMPLETION CARD ===== */
+.completion-card {
+  text-align: center;
+}
+
+.completion-score-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+  border-radius: 12px;
+  border: 2px solid #e8ecff;
+}
+
+.completion-score-number {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.completion-score-label {
+  font-size: 20px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.completion-progress {
+  color: #718096;
+  font-size: 15px;
+  margin: 16px 0 24px;
+}
+
+/* ===== 8-MESSAGE DIFFICULTY CARD ===== */
+.diff-message-card {
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  text-align: left;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.diff-message-card--up {
+  background: #e8f5e9;
+  border: 2px solid #81c784;
+}
+
+.diff-message-card--down {
+  background: #fff8e1;
+  border: 2px solid #ffb74d;
+}
+
+.diff-message-card--same {
+  background: #f0f4ff;
+  border: 2px solid #b3c5ff;
+}
+
+.diff-message-card--nearly {
+  background: #fff3e0;
+  border: 2px solid #ffb74d;
+}
+
+.diff-message-card--rushing {
+  background: #fff8e1;
+  border: 2px solid #ff9800;
+}
+
+.diff-message-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.diff-message-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.diff-message-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.diff-message-body {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+/* Nearly-there progress bar */
+.nearly-there-progress {
+  margin: 10px 0 12px;
+}
+
+.nearly-there-track {
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.nearly-there-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9800, #f57c00);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.nearly-there-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e65100;
+}
+
+.diff-new-level {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.diff-new-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #718096;
+}
+
+/* ===== END COMPLETION CARD ===== */
+
 @media (max-width: 768px) {
   .practice-page {
     padding: 15px;
@@ -461,6 +673,10 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+  }
+
+  .completion-score-number {
+    font-size: 48px;
   }
 }
 

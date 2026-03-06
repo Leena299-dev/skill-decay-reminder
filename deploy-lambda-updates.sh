@@ -3,6 +3,22 @@
 
 echo "Deploying updated Lambda functions..."
 
+# Deploy ai-coach Lambda
+echo ""
+echo "Packaging ai-coach Lambda..."
+cd lambda/ai-coach && zip -r ../ai-coach.zip . && cd ../..
+echo "Deploying ai-coach Lambda..."
+aws lambda update-function-code \
+  --function-name SkillDecay-AICoach \
+  --zip-file fileb://lambda/ai-coach.zip \
+  --region us-east-1
+
+if [ $? -eq 0 ]; then
+    echo "✓ AI Coach Lambda deployed successfully"
+else
+    echo "✗ Failed to deploy AI Coach Lambda"
+fi
+
 # Deploy analytics Lambda
 echo ""
 echo "Deploying analytics Lambda..."
@@ -19,6 +35,8 @@ fi
 
 # Deploy practice-session Lambda
 echo ""
+echo "Packaging practice-session Lambda..."
+cd lambda/practice-session && zip -r ../practice-session.zip . && cd ../..
 echo "Deploying practice-session Lambda..."
 aws lambda update-function-code \
   --function-name SkillDecay-PracticeSession \

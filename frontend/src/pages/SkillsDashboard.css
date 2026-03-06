@@ -221,6 +221,32 @@
   letter-spacing: 0.5px;
 }
 
+.skill-difficulty-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.skill-difficulty-badge--beginner {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.skill-difficulty-badge--intermediate {
+  background: #fff8e1;
+  color: #e65100;
+}
+
+.skill-difficulty-badge--advanced {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
 .skill-days-label {
   font-size: 13px;
   color: #555;

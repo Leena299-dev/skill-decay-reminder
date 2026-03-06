@@ -3,15 +3,17 @@ import SkillsDashboard from '../pages/SkillsDashboard';
 import Analytics from '../pages/Analytics';
 import Welcome from '../pages/Welcome';
 import Settings from '../pages/Settings';
+import AICoach from '../pages/AICoach';
 import NotificationCentre from './NotificationCentre';
 import { getNotifications } from '../services/api';
 import './AppShell.css';
 
 const NAV_ITEMS = [
-  { id: 'welcome',    icon: '🏠', label: 'Welcome'   },
-  { id: 'dashboard',  icon: '🎯', label: 'Dashboard'  },
-  { id: 'analytics',  icon: '📊', label: 'Analytics'  },
-  { id: 'settings',   icon: '⚙️', label: 'Settings'   },
+  { id: 'welcome',    icon: '🏠', label: 'Welcome'    },
+  { id: 'dashboard',  icon: '🎯', label: 'Dashboard'   },
+  { id: 'analytics',  icon: '📊', label: 'Analytics'   },
+  { id: 'coach',      icon: '🤖', label: 'AI Coach'    },
+  { id: 'settings',   icon: '⚙️', label: 'Settings'    },
 ];
 
 function AppShell({ userId, userName, onLogout, defaultPage = 'welcome' }) {
@@ -53,6 +55,7 @@ function AppShell({ userId, userName, onLogout, defaultPage = 'welcome' }) {
     if (currentPage === 'analytics') return <Analytics userId={userId} />;
     if (currentPage === 'welcome')   return <Welcome userName={userName} onNavigate={setCurrentPage} />;
     if (currentPage === 'settings')  return <Settings userId={userId} />;
+    if (currentPage === 'coach')     return <AICoach userId={userId} onNavigate={setCurrentPage} onPracticeSkill={handlePracticeSkill} />;
     return (
       <SkillsDashboard
         userId={userId}

@@ -72,7 +72,7 @@ export const deleteSkill = async (skillId, userId) => {
 };
 
 // Generate AI practice exercise
-export const generateExercise = async (userId, skillId, skillName, category, proficiency) => {
+export const generateExercise = async (userId, skillId, skillName, category, proficiency, adaptiveDifficulty) => {
   try {
     const response = await axios.post(`${API_URL}/practice`, {
       userId,
@@ -80,6 +80,7 @@ export const generateExercise = async (userId, skillId, skillName, category, pro
       skillName,
       category,
       proficiency,
+      adaptiveDifficulty,
       exerciseType: 'coding_challenge'
     });
     return response.data;
@@ -90,19 +91,35 @@ export const generateExercise = async (userId, skillId, skillName, category, pro
 };
 
 // Submit practice session score
-export const submitPracticeSession = async (userId, skillId, exerciseId, score, timeSpent) => {
+export const submitPracticeSession = async (userId, skillId, exerciseId, score, timeSpent, actualTimeSeconds, estimatedTimeMinutes) => {
   try {
     const response = await axios.post(`${API_URL}/practice-session`, {
       userId,
       skillId,
       exerciseId,
       score,
-      timeSpent
+      timeSpent,
+      actualTimeSeconds,
+      estimatedTimeMinutes,
     });
     return response.data;
   } catch (error) {
     console.error('Submit practice session error:', error);
     throw error;
+  }
+};
+
+// Send message to AI Learning Coach
+export const postCoachMessage = async (userId, message, conversationHistory = []) => {
+  try {
+    const response = await axios.post(`${API_URL}/coach`, {
+      userId,
+      message,
+      conversationHistory,
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
   }
 };
 
