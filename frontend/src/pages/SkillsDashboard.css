@@ -589,3 +589,33 @@
     padding: 24px;
   }
 }
+
+/* ===== CATEGORY SUGGESTION ===== */
+.form-error {
+  font-size: 12px;
+  color: #e53e3e;
+  margin-top: 4px;
+}
+
+/* ===== SUBMIT TOAST ===== */
+.submit-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #667eea;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(102,126,234,0.4);
+  z-index: 9999;
+  white-space: nowrap;
+  animation: toast-in 0.25s ease;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getSkills, createSkill, updateSkill, deleteSkill, getAnalytics } from '../services/api';
+import { SKILL_CATEGORIES, getCategoryLabel, normalizeCategory } from '../utils/categories';
 import './SkillsDashboard.css';
 import PracticePage from './PracticePage';
 
@@ -44,7 +45,7 @@ function SkillsDashboard({ userId, autoOpenAddModal, onAddModalOpened, autoOpenP
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingSkill, setEditingSkill] = useState(null);
   const [formData, setFormData] = useState({
-    skillName: '', category: 'coding', proficiency: 'beginner', learningDate: '', importance: 'medium'
+    skillName: '', category: 'certification', proficiency: 'beginner', learningDate: '', importance: 'medium'
   });
   const [showPractice, setShowPractice] = useState(null);
   const [practiceStats, setPracticeStats] = useState({
@@ -101,13 +102,19 @@ function SkillsDashboard({ userId, autoOpenAddModal, onAddModalOpened, autoOpenP
 
   const handleAddClick = () => {
     setEditingSkill(null);
-    setFormData({ skillName: '', category: 'coding', proficiency: 'beginner', learningDate: '', importance: 'medium' });
+    setFormData({ skillName: '', category: 'certification', proficiency: 'beginner', learningDate: '', importance: 'medium' });
     setShowAddForm(true);
   };
 
   const handleEdit = (skill) => {
     setEditingSkill(skill);
-    setFormData({ skillName: skill.skillName, category: skill.category, proficiency: skill.proficiency, learningDate: skill.learningDate, importance: skill.importance });
+    setFormData({
+      skillName: skill.skillName,
+      category: normalizeCategory(skill.category),
+      proficiency: skill.proficiency,
+      learningDate: skill.learningDate,
+      importance: skill.importance,
+    });
     setShowAddForm(true);
   };
 
@@ -117,11 +124,13 @@ function SkillsDashboard({ userId, autoOpenAddModal, onAddModalOpened, autoOpenP
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); setLoading(true); setError(null);
+    e.preventDefault();
+    setLoading(true); setError(null);
     try {
       if (editingSkill) { await updateSkill(editingSkill.skillId, userId, formData); }
       else { await createSkill(userId, formData); }
-      setShowAddForm(false); setEditingSkill(null); await loadSkills();
+      setShowAddForm(false); setEditingSkill(null);
+      await loadSkills();
     } catch (err) { setError(err.error || 'Failed to save skill'); }
     finally { setLoading(false); }
   };
@@ -234,7 +243,7 @@ function SkillsDashboard({ userId, autoOpenAddModal, onAddModalOpened, autoOpenP
               <div className="priority-card__info">
                 <div className="priority-card__title-row">
                   <span className="priority-card__skill-name">{prioritySkill.skillName}</span>
-                  <span className="priority-card__category">{prioritySkill.category}</span>
+                  <span className="priority-card__category">{getCategoryLabel(prioritySkill.category)}</span>
                 </div>
                 <p className="priority-card__message">{getUrgencyMessage(priorityDaysUntil)}</p>
                 <div className="priority-card__health skill-health-bar-container">
@@ -303,7 +312,7 @@ function SkillsDashboard({ userId, autoOpenAddModal, onAddModalOpened, autoOpenP
                     {isNew && <span className="skill-badge-new">NEW</span>}
                     <div className="skill-header">
                       <h3>{skill.skillName}</h3>
-                      <span className="skill-category">{skill.category}</span>
+                      <span className="skill-category">{getCategoryLabel(skill.category)}</span>
                     </div>
                     {skill.adaptiveDifficulty && (
                       <span className={`skill-difficulty-badge skill-difficulty-badge--${skill.adaptiveDifficulty.split('_')[0]}`}>
@@ -349,8 +358,9 @@ function SkillsDashboard({ userId, autoOpenAddModal, onAddModalOpened, autoOpenP
                   <div className="form-group"><label>Skill Name</label><input type="text" name="skillName" value={formData.skillName} onChange={handleInputChange} required /></div>
                   <div className="form-group"><label>Category</label>
                     <select name="category" value={formData.category} onChange={handleInputChange}>
-                      <option value="language">Language</option><option value="coding">Coding</option>
-                      <option value="certification">Certification</option><option value="instrument">Instrument</option><option value="other">Other</option>
+                      {SKILL_CATEGORIES.map(c => (
+                        <option key={c.value} value={c.value}>{c.label}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="form-group"><label>Proficiency</label>
