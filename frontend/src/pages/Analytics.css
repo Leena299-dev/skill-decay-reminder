@@ -340,3 +340,261 @@
 
   .an-risk-days { display: none; }
 }
+
+/* ── AI Feedback Summary ──────────────────────────────────── */
+.an-ai-summary {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.an-ai-stat {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  padding: 16px 20px;
+}
+
+.an-ai-stat-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: #333;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.an-ai-stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.an-ai-stat-avg {
+  font-size: 13px;
+  color: #667eea;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.an-ai-divider {
+  width: 1px;
+  height: 60px;
+  background: #e0e0e0;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   AI Learning Insights section
+   ══════════════════════════════════════════════════════════ */
+
+.an-ai-insights-card {
+  border-top: 3px solid #667eea;
+}
+
+.an-insights-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.an-refresh-btn {
+  background: none;
+  border: 1.5px solid #764ba2;
+  color: #764ba2;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.an-refresh-btn:hover:not(:disabled) {
+  background: #764ba2;
+  color: white;
+}
+.an-refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Loading skeleton */
+.an-insights-loading {
+  padding: 8px 0 12px;
+}
+.an-insights-pulse {
+  height: 16px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: an-shimmer 1.5s infinite;
+  margin-bottom: 10px;
+}
+.an-insights-pulse--sm {
+  width: 55%;
+}
+@keyframes an-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.an-insights-loading-text {
+  font-size: 13px;
+  color: #999;
+  margin: 12px 0 0;
+  font-style: italic;
+}
+
+.an-insights-error {
+  font-size: 14px;
+  color: #888;
+  padding: 4px 0 8px;
+}
+
+/* Overall insight paragraph */
+.an-overall-insight {
+  font-size: 15px;
+  color: #444;
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+
+/* Spotlight row — 3 cards */
+.an-spotlight-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.an-spotlight-card {
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.an-spotlight-focus    { background: #fff8e1; border: 1.5px solid #ffb74d; }
+.an-spotlight-momentum { background: #e8f5e9; border: 1.5px solid #81c784; }
+.an-spotlight-strength { background: #f3e5f5; border: 1.5px solid #ce93d8; }
+
+.an-spotlight-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+.an-spotlight-type {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #999;
+}
+.an-spotlight-skill {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin-top: 2px;
+}
+.an-spotlight-reason {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Weekly recommendation bar */
+.an-weekly-rec {
+  background: #f0f4ff;
+  border: 1.5px solid #c5ceff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+
+/* Per-skill expandable insights */
+.an-skill-insights-list {
+  border: 1px solid #ebebeb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.an-skill-insight {
+  border-bottom: 1px solid #ebebeb;
+}
+.an-skill-insight:last-child {
+  border-bottom: none;
+}
+.an-skill-insight-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.an-skill-insight-toggle:hover {
+  background: #fafafa;
+}
+.an-si-chevron {
+  font-size: 10px;
+  color: #bbb;
+  flex-shrink: 0;
+  width: 12px;
+}
+.an-si-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+.an-si-trend-badge {
+  font-size: 12px;
+  padding: 2px 9px;
+  border-radius: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.trend-improving .an-si-trend-badge { background: #e8f5e9; color: #2e7d32; }
+.trend-stable    .an-si-trend-badge { background: #e3f2fd; color: #1565c0; }
+.trend-declining .an-si-trend-badge { background: #fff3e0; color: #e65100; }
+.trend-new       .an-si-trend-badge { background: #f3e5f5; color: #6a1b9a; }
+
+.an-skill-insight-body {
+  padding: 2px 14px 14px 36px;
+}
+.an-si-insight {
+  font-size: 13px;
+  color: #555;
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 5px;
+}
+.an-si-action {
+  font-size: 13px;
+  color: #764ba2;
+  font-weight: 600;
+}
+
+/* Footer timestamp */
+.an-insights-footer {
+  font-size: 11px;
+  color: #bbb;
+  text-align: right;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .an-spotlight-row {
+    grid-template-columns: 1fr;
+  }
+}

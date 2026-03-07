@@ -19,8 +19,26 @@ else
     echo "✗ Failed to deploy AI Coach Lambda"
 fi
 
+# Deploy answer-evaluator Lambda
+echo ""
+echo "Packaging answer-evaluator Lambda..."
+cd lambda/answer-evaluator && zip -r ../answer-evaluator.zip . && cd ../..
+echo "Deploying answer-evaluator Lambda..."
+aws lambda update-function-code \
+  --function-name SkillDecay-AnswerEvaluator \
+  --zip-file fileb://lambda/answer-evaluator.zip \
+  --region us-east-1
+
+if [ $? -eq 0 ]; then
+    echo "✓ Answer-evaluator Lambda deployed successfully"
+else
+    echo "✗ Failed to deploy Answer-evaluator Lambda"
+fi
+
 # Deploy analytics Lambda
 echo ""
+echo "Packaging analytics Lambda..."
+cd lambda/analytics && zip -r ../analytics.zip . && cd ../..
 echo "Deploying analytics Lambda..."
 aws lambda update-function-code \
   --function-name SkillDecay-Analytics \

@@ -13,6 +13,7 @@ bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
 
 SKILLS_TABLE = os.environ.get('SKILLS_TABLE', 'Skills')
 HISTORY_TABLE = os.environ.get('HISTORY_TABLE', 'PracticeHistory')
+USERS_TABLE  = os.environ.get('USERS_TABLE', 'Users')
 BEDROCK_MODEL_ID = os.environ.get('BEDROCK_MODEL_ID', 'us.amazon.nova-micro-v1:0')
 MAX_TOKENS = 600
 MAX_HISTORY = 10  # conversation turns to keep
@@ -32,6 +33,17 @@ def decimal_to_number(obj):
         n = float(obj)
         return int(n) if n == int(n) else n
     raise TypeError
+
+
+def get_latest_analysis(user_id):
+    """Fetch cached AI progress analysis from Users table (best-effort)."""
+    try:
+        table = dynamodb.Table(USERS_TABLE)
+        resp = table.get_item(Key={'userId': user_id})
+        raw = resp.get('Item', {}).get('lastAnalysis')
+        return json.loads(raw) if raw else None
+    except Exception:
+        return None
 
 
 def get_skills(user_id):
@@ -110,6 +122,46 @@ def compute_stats(skills, history):
             v = decimal_to_number(ts) if isinstance(ts, Decimal) else ts
             skill_data[sid]['last_ts'] = max(skill_data[sid]['last_ts'], v)
 
+    def _to_num(v):
+        return decimal_to_number(v) if isinstance(v, Decimal) else v
+
+    sorted_history = sorted(history, key=lambda x: _to_num(x.get('completedAt', 0)), reverse=True)
+
+    # Recent AI feedback (last 3 sessions that used AI evaluation)
+    recent_ai_feedback = []
+    for h in sorted_history:
+        if not h.get('usedAIFeedback') or not h.get('aiImprovementTip'):
+            continue
+        raw_score = _to_num(h.get('aiFeedbackScore') or h.get('score', 0))
+        recent_ai_feedback.append({
+            'skillName': h.get('skillName', 'Unknown'),
+            'score': int(raw_score),
+            'whatWasMissing': h.get('aiWhatWasMissing', ''),
+            'improvementTip': h.get('aiImprovementTip', ''),
+        })
+        if len(recent_ai_feedback) >= 3:
+            break
+
+    # Recent multi-attempt sessions (last 3 where user tried again after AI feedback)
+    recent_multi_attempts = []
+    for h in sorted_history:
+        total_att = int(_to_num(h.get('totalAttempts', 1)))
+        if total_att <= 1:
+            continue
+        first_score = h.get('firstAttemptScore')
+        final_score = _to_num(h.get('score', 0))
+        if first_score is not None:
+            first_score = int(_to_num(first_score))
+        recent_multi_attempts.append({
+            'skillName': h.get('skillName', 'Unknown'),
+            'totalAttempts': total_att,
+            'firstScore': first_score,
+            'finalScore': int(final_score),
+            'improved': first_score is not None and int(final_score) > first_score,
+        })
+        if len(recent_multi_attempts) >= 3:
+            break
+
     # Overdue / due this week counts
     overdue_count = 0
     due_week_count = 0
@@ -133,10 +185,12 @@ def compute_stats(skills, history):
         'overdue': overdue_count,
         'dueThisWeek': due_week_count,
         'skillData': skill_data,
+        'recentAIFeedback': recent_ai_feedback,
+        'recentMultiAttempts': recent_multi_attempts,
     }
 
 
-def build_system_prompt(skills, stats):
+def build_system_prompt(skills, stats, latest_analysis=None):
     today = datetime.now(timezone.utc).date()
     skill_data = stats['skillData']
 
@@ -195,6 +249,47 @@ def build_system_prompt(skills, stats):
 
     skills_section = '\n'.join(skill_lines) if skill_lines else '  (no skills added yet — encourage the user to add some!)'
 
+    ai_feedback_items = stats.get('recentAIFeedback', [])
+    if ai_feedback_items:
+        ai_feedback_lines = [
+            f'  • {fb["skillName"]}: score {fb["score"]}%'
+            + (f', missing="{fb["whatWasMissing"]}"' if fb.get('whatWasMissing') else '')
+            + (f', tip="{fb["improvementTip"]}"' if fb.get('improvementTip') else '')
+            for fb in ai_feedback_items
+        ]
+        ai_feedback_section = '\n'.join(ai_feedback_lines)
+    else:
+        ai_feedback_section = '  (no AI-evaluated sessions yet)'
+
+    multi_attempt_items = stats.get('recentMultiAttempts', [])
+    if multi_attempt_items:
+        multi_lines = []
+        for ma in multi_attempt_items:
+            improvement = ''
+            if ma.get('firstScore') is not None:
+                diff = ma['finalScore'] - ma['firstScore']
+                improvement = f', improved by {diff:+d}%' if diff != 0 else ', no score change'
+            multi_lines.append(
+                f'  • {ma["skillName"]}: {ma["totalAttempts"]} attempts, '
+                f'first={ma["firstScore"]}%, final={ma["finalScore"]}%{improvement}'
+            )
+        multi_attempt_section = '\n'.join(multi_lines)
+    else:
+        multi_attempt_section = '  (no multi-attempt sessions yet)'
+
+    # Latest progress analysis (from progress-analysis Lambda cache)
+    analysis_section = ''
+    if latest_analysis:
+        focus    = latest_analysis.get('focusSkill')    or {}
+        momentum = latest_analysis.get('momentumSkill') or {}
+        overview = latest_analysis.get('overallInsight', '')
+        analysis_section = f"""
+
+LATEST AI PROGRESS ANALYSIS:
+  Overview: {overview}
+  Focus skill: {focus.get('name', 'N/A')} — {focus.get('reason', '')}
+  Momentum skill: {momentum.get('name', 'N/A')} — {momentum.get('reason', '')}"""
+
     return f"""You are an expert AI Learning Coach for SharpEdge, an app that uses the forgetting curve and spaced repetition to prevent skill decay.
 
 You have access to this user's real learning data:
@@ -208,6 +303,12 @@ PRACTICE SUMMARY:
   • Current streak: {stats['streak']} day(s)
   • Skills overdue: {stats['overdue']}
   • Skills due this week: {stats['dueThisWeek']}
+
+RECENT AI FEEDBACK (last 3 AI-evaluated sessions):
+{ai_feedback_section}
+
+RECENT MULTI-ATTEMPT SESSIONS (user tried again after seeing AI feedback):
+{multi_attempt_section}{analysis_section}
 
 Use this data to give highly personalised, specific advice. Always be encouraging, warm and motivating. Keep responses concise — 2–4 sentences for simple questions, structured with bullet points for complex advice. When recommending practice, be specific about which skill and why. Never make up data — only reference the actual skills and scores provided above. Base your advice on spaced repetition and forgetting curve science. If asked about a skill not in their list, suggest they add it to SharpEdge."""
 
@@ -237,7 +338,8 @@ def lambda_handler(event, context):
     skills = get_skills(user_id)
     history = get_practice_history(user_id, days=90)
     stats = compute_stats(skills, history)
-    system_prompt = build_system_prompt(skills, stats)
+    latest_analysis = get_latest_analysis(user_id)
+    system_prompt = build_system_prompt(skills, stats, latest_analysis)
 
     # Build Bedrock messages — keep last MAX_HISTORY turns, append current
     trimmed = conv_history[-(MAX_HISTORY - 1):] if len(conv_history) >= MAX_HISTORY else conv_history

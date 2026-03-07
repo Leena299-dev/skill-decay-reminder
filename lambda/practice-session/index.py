@@ -314,6 +314,11 @@ def lambda_handler(event, context):
         time_spent = body.get('timeSpent')
         actual_time_seconds = body.get('actualTimeSeconds')
         estimated_time_minutes = body.get('estimatedTimeMinutes', 15)
+        final_attempt_time_seconds = body.get('finalAttemptTimeSeconds')
+        total_attempts = int(body.get('totalAttempts', 1))
+        first_attempt_score_body = body.get('firstAttemptScore')
+        final_score_body = body.get('finalScore')
+        attempt_scores_body = body.get('attemptScores', [])
 
         # Validate required fields
         if not user_id:
@@ -342,6 +347,12 @@ def lambda_handler(event, context):
             actual_time_seconds = int(actual_time_seconds)
         if estimated_time_minutes is not None:
             estimated_time_minutes = int(estimated_time_minutes)
+        if final_attempt_time_seconds is not None:
+            final_attempt_time_seconds = int(final_attempt_time_seconds)
+        if first_attempt_score_body is not None:
+            first_attempt_score_body = int(first_attempt_score_body)
+        if final_score_body is not None:
+            final_score_body = int(final_score_body)
 
         logger.info(f"Processing: userId={user_id}, skillId={skill_id}, score={score}")
 
@@ -384,9 +395,29 @@ def lambda_handler(event, context):
             'nextReminderDate': next_date,
             'date': today,
             'estimatedTimeMinutes': estimated_time_minutes,
+            'usedAIFeedback': bool(body.get('usedAIFeedback', False)),
         }
         if actual_time_seconds is not None:
             history_item['actualTimeSeconds'] = actual_time_seconds
+        if body.get('aiFeedbackScore') is not None:
+            history_item['aiFeedbackScore'] = int(body['aiFeedbackScore'])
+        if body.get('aiWhatWasCorrect'):
+            history_item['aiWhatWasCorrect'] = str(body['aiWhatWasCorrect'])[:500]
+        if body.get('aiWhatWasMissing'):
+            history_item['aiWhatWasMissing'] = str(body['aiWhatWasMissing'])[:500]
+        if body.get('aiImprovementTip'):
+            history_item['aiImprovementTip'] = str(body['aiImprovementTip'])[:500]
+        # Multi-attempt tracking
+        if total_attempts > 1:
+            history_item['totalAttempts'] = total_attempts
+        if first_attempt_score_body is not None:
+            history_item['firstAttemptScore'] = first_attempt_score_body
+        if final_score_body is not None:
+            history_item['finalScore'] = final_score_body
+        if attempt_scores_body:
+            history_item['attemptScores'] = [int(s) for s in attempt_scores_body if s is not None]
+        if final_attempt_time_seconds is not None:
+            history_item['finalAttemptTimeSeconds'] = final_attempt_time_seconds
         history_table.put_item(Item=history_item)
 
         # ── Step 1: Core update — always runs, score is never lost ───────────
@@ -427,7 +458,9 @@ def lambda_handler(event, context):
             'sessions_to_levelup': None,
             'show_hints': False,
         }
-        time_performance = analyse_time_performance(actual_time_seconds, estimated_time_minutes)
+        # Use finalAttemptTimeSeconds when present (avoids penalising time spent reading AI feedback)
+        time_analysis_seconds = final_attempt_time_seconds if final_attempt_time_seconds is not None else actual_time_seconds
+        time_performance = analyse_time_performance(time_analysis_seconds, estimated_time_minutes)
 
         try:
             # Safely convert recentScores — handles list, set, or missing attr
@@ -472,9 +505,10 @@ def lambda_handler(event, context):
                 ':smh': diff_result['show_hints'],
                 ':ltp': time_performance,
             }
-            if actual_time_seconds is not None:
+            stored_time = final_attempt_time_seconds if final_attempt_time_seconds is not None else actual_time_seconds
+            if stored_time is not None:
                 diff_update_expr += ", lastActualTimeSeconds = :lats"
-                diff_update_vals[':lats'] = actual_time_seconds
+                diff_update_vals[':lats'] = stored_time
 
             skills_table.update_item(
                 Key={'skillId': skill_id, 'userId': user_id},

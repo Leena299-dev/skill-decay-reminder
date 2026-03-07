@@ -196,6 +196,18 @@ def lambda_handler(event, context):
         # Sort by sessions (most practiced first)
         practice_by_skill.sort(key=lambda x: x['sessions'], reverse=True)
         
+        # AI feedback vs self-mark stats
+        ai_sessions = [s for s in sessions if s.get('usedAIFeedback')]
+        self_mark_sessions = [s for s in sessions if not s.get('usedAIFeedback')]
+        avg_ai_score = (
+            round(sum(int(s.get('aiFeedbackScore', s.get('score', 0))) for s in ai_sessions) / len(ai_sessions), 1)
+            if ai_sessions else 0
+        )
+        avg_self_mark_score = (
+            round(sum(int(s.get('score', 0)) for s in self_mark_sessions) / len(self_mark_sessions), 1)
+            if self_mark_sessions else 0
+        )
+
         # Build response
         analytics = {
             'streak': streak,
@@ -203,7 +215,11 @@ def lambda_handler(event, context):
             'totalTime': total_time,
             'averageScore': avg_score,
             'practiceFrequency': practice_frequency,
-            'practiceBySkill': practice_by_skill
+            'practiceBySkill': practice_by_skill,
+            'aiSessions': len(ai_sessions),
+            'selfMarkSessions': len(self_mark_sessions),
+            'avgAIScore': avg_ai_score,
+            'avgSelfMarkScore': avg_self_mark_score,
         }
         
         return {

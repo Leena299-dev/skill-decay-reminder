@@ -91,21 +91,31 @@ export const generateExercise = async (userId, skillId, skillName, category, pro
 };
 
 // Submit practice session score
-export const submitPracticeSession = async (userId, skillId, exerciseId, score, timeSpent, actualTimeSeconds, estimatedTimeMinutes) => {
+export const submitPracticeSession = async (userId, skillId, exerciseId, score, timeSpent, actualTimeSeconds, estimatedTimeMinutes, aiData = null) => {
   try {
-    const response = await axios.post(`${API_URL}/practice-session`, {
-      userId,
-      skillId,
-      exerciseId,
-      score,
-      timeSpent,
-      actualTimeSeconds,
-      estimatedTimeMinutes,
-    });
+    const body = { userId, skillId, exerciseId, score, timeSpent, actualTimeSeconds, estimatedTimeMinutes };
+    if (aiData) Object.assign(body, aiData);
+    const response = await axios.post(`${API_URL}/practice-session`, body);
     return response.data;
   } catch (error) {
     console.error('Submit practice session error:', error);
     throw error;
+  }
+};
+
+// Evaluate a user's answer with AI
+export const evaluateAnswer = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/evaluate-answer`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Evaluate answer error:', error);
+    // Return graceful fallback so frontend can show self-mark option
+    return {
+      score: null,
+      detailedFeedback: 'AI feedback is temporarily unavailable. Please use self-marking instead.',
+      error: true,
+    };
   }
 };
 
@@ -170,6 +180,17 @@ export const markNotificationsRead = async (userId, notificationIds) => {
     const response = await axios.put(`${API_URL}/notifications/read`, { userId, notificationIds });
     return response.data;
   } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+// Get AI progress analysis (full_analysis or session_insight)
+export const getProgressAnalysis = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/progress-analysis`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Progress analysis error:', error);
     throw error.response?.data || error.message;
   }
 };

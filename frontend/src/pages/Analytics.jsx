@@ -6,7 +6,7 @@ import {
 import './Analytics.css';
 import StreakBadge from '../components/StreakBadge';
 import PracticeHeatmap from '../components/PracticeHeatmap';
-import { getAnalytics, getSkills } from '../services/api';
+import { getAnalytics, getSkills, getProgressAnalysis } from '../services/api';
 
 const INTERVALS = [1, 3, 7, 14, 30, 60];
 
@@ -44,22 +44,113 @@ function healthLabel(status) {
   return map[status] || status;
 }
 
+function formatLastUpdated(isoString) {
+  if (!isoString) return 'unknown';
+  try {
+    const date = new Date(isoString);
+    const diffMins = Math.floor((Date.now() - date.getTime()) / 60000);
+    if (diffMins < 1)  return 'just now';
+    if (diffMins < 60) return `${diffMins} min ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return date.toLocaleDateString();
+  } catch {
+    return 'recently';
+  }
+}
+
+function trendIcon(trend) {
+  return { improving: '📈', stable: '➡️', declining: '📉', new: '✨' }[trend] || '➡️';
+}
+
+function trendLabel(trend) {
+  return { improving: 'Improving', stable: 'Stable', declining: 'Needs Attention', new: 'New' }[trend] || trend;
+}
+
 function Analytics({ userId }) {
   const [analytics, setAnalytics] = useState({
     streak: 0, totalSessions: 0, totalTime: 0, averageScore: 0,
-    practiceFrequency: [], practiceBySkill: []
+    practiceFrequency: [], practiceBySkill: [],
+    aiSessions: 0, selfMarkSessions: 0, avgAIScore: 0, avgSelfMarkScore: 0,
   });
   const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // AI insights state
+  const [aiAnalysis, setAiAnalysis]           = useState(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisError, setAnalysisError]     = useState(false);
+  const [expandedInsights, setExpandedInsights] = useState({});
+
+  const parseAnalysisResult = (raw) => {
+    console.log('=== PROGRESS ANALYSIS RAW ===');
+    console.log(JSON.stringify(raw, null, 2));
+
+    if (!raw) return null;
+
+    // Shape B: body is a nested JSON string
+    if (typeof raw.body === 'string') {
+      try {
+        const parsed = JSON.parse(raw.body);
+        console.log('Parsed from body string:', parsed);
+        return parsed;
+      } catch (e) {
+        console.error('Failed to parse body string:', e);
+      }
+    }
+
+    // Shape B: body is already an object
+    if (raw.body && typeof raw.body === 'object') {
+      return raw.body;
+    }
+
+    // Shape A: response IS the data directly
+    if (raw.overallInsight) {
+      console.log('Direct shape detected');
+      return raw;
+    }
+
+    // Unknown shape
+    console.error('Unknown response shape:', JSON.stringify(raw));
+    return null;
+  };
+
+  const handleAnalysisResponse = (raw) => {
+    const result = parseAnalysisResult(raw);
+    console.log('Final result:', result);
+    console.log('Has overallInsight:', !!result?.overallInsight);
+
+    if (result && result.overallInsight) {
+      setAiAnalysis(result);
+      setAnalysisError(false);
+    } else if (result && result.error === true) {
+      console.error('Lambda error:', result.message);
+      setAnalysisError(true);
+    } else {
+      console.error('No usable data in result:', result);
+      setAnalysisError(true);
+    }
+  };
+
+  const loadAnalysis = (forceRefresh = false) => {
+    setAnalysisLoading(true);
+    setAnalysisError(false);
+    getProgressAnalysis({ userId, requestType: 'full_analysis', forceRefresh })
+      .then(handleAnalysisResponse)
+      .catch(() => setAnalysisError(true))
+      .finally(() => setAnalysisLoading(false));
+  };
 
   useEffect(() => {
     if (!userId) return;
     const load = async () => {
       setLoading(true);
+      setAnalysisLoading(true);
+      setAnalysisError(false);
       try {
         const [analyticsResult, skillsResult] = await Promise.all([
           getAnalytics(userId),
-          getSkills(userId)
+          getSkills(userId),
         ]);
         setAnalytics(analyticsResult);
         setSkills(skillsResult.skills || []);
@@ -68,6 +159,11 @@ function Analytics({ userId }) {
       } finally {
         setLoading(false);
       }
+      // Load AI analysis independently so main content isn't blocked
+      getProgressAnalysis({ userId, requestType: 'full_analysis' })
+        .then(handleAnalysisResponse)
+        .catch(() => setAnalysisError(true))
+        .finally(() => setAnalysisLoading(false));
     };
     load();
   }, [userId]);
@@ -113,6 +209,111 @@ function Analytics({ userId }) {
     <div className="analytics-container">
       <div className="an-page-header">
         <h1>📊 Analytics</h1>
+      </div>
+
+      {/* ── Section 0: AI Learning Insights ───────────────────────────────── */}
+      <div className="an-card an-card--full an-ai-insights-card">
+        <div className="an-insights-header">
+          <h2 className="an-card-title">🤖 Your AI Learning Insights</h2>
+          <button
+            className="an-refresh-btn"
+            onClick={() => loadAnalysis(true)}
+            disabled={analysisLoading}
+          >
+            {analysisLoading ? '...' : '↻ Refresh'}
+          </button>
+        </div>
+
+        {analysisLoading && (
+          <div className="an-insights-loading">
+            <div className="an-insights-pulse" />
+            <div className="an-insights-pulse an-insights-pulse--sm" />
+            <p className="an-insights-loading-text">Generating your personalised insights...</p>
+          </div>
+        )}
+
+        {!analysisLoading && analysisError && (
+          <p className="an-insights-error">
+            Could not generate insights. Make sure you have practice sessions recorded, then try Refresh.
+          </p>
+        )}
+
+        {!analysisLoading && aiAnalysis && (
+          <>
+            <p className="an-overall-insight">{aiAnalysis.overallInsight}</p>
+
+            {/* Spotlight row */}
+            <div className="an-spotlight-row">
+              {aiAnalysis.focusSkill?.name && (
+                <div className="an-spotlight-card an-spotlight-focus">
+                  <span className="an-spotlight-icon">🎯</span>
+                  <span className="an-spotlight-type">Focus</span>
+                  <span className="an-spotlight-skill">{aiAnalysis.focusSkill.name}</span>
+                  <span className="an-spotlight-reason">{aiAnalysis.focusSkill.reason}</span>
+                </div>
+              )}
+              {aiAnalysis.momentumSkill?.name && (
+                <div className="an-spotlight-card an-spotlight-momentum">
+                  <span className="an-spotlight-icon">🚀</span>
+                  <span className="an-spotlight-type">Momentum</span>
+                  <span className="an-spotlight-skill">{aiAnalysis.momentumSkill.name}</span>
+                  <span className="an-spotlight-reason">{aiAnalysis.momentumSkill.reason}</span>
+                </div>
+              )}
+              {aiAnalysis.strengthSkill?.name && (
+                <div className="an-spotlight-card an-spotlight-strength">
+                  <span className="an-spotlight-icon">⭐</span>
+                  <span className="an-spotlight-type">Strength</span>
+                  <span className="an-spotlight-skill">{aiAnalysis.strengthSkill.name}</span>
+                  <span className="an-spotlight-reason">{aiAnalysis.strengthSkill.reason}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Weekly recommendation */}
+            {aiAnalysis.weeklyRecommendation && (
+              <div className="an-weekly-rec">
+                📋 <strong>This week:</strong> {aiAnalysis.weeklyRecommendation}
+              </div>
+            )}
+
+            {/* Per-skill insights — expandable rows */}
+            {aiAnalysis.skillInsights?.length > 0 && (
+              <div className="an-skill-insights-list">
+                {aiAnalysis.skillInsights.map(si => (
+                  <div key={si.skillName} className={`an-skill-insight trend-${si.trend}`}>
+                    <button
+                      className="an-skill-insight-toggle"
+                      onClick={() => setExpandedInsights(prev => ({
+                        ...prev,
+                        [si.skillName]: !prev[si.skillName],
+                      }))}
+                    >
+                      <span className="an-si-chevron">
+                        {expandedInsights[si.skillName] ? '▼' : '▶'}
+                      </span>
+                      <span className="an-si-name">{si.skillName}</span>
+                      <span className="an-si-trend-badge">
+                        {trendIcon(si.trend)} {trendLabel(si.trend)}
+                      </span>
+                    </button>
+                    {expandedInsights[si.skillName] && (
+                      <div className="an-skill-insight-body">
+                        <p className="an-si-insight">"{si.insight}"</p>
+                        <p className="an-si-action">→ {si.action}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="an-insights-footer">
+              {aiAnalysis.fromCache ? 'Cached · ' : ''}
+              Last updated: {formatLastUpdated(aiAnalysis.generatedAt)}
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Section 1: Learning Snapshot ─────────────────────────────────── */}
@@ -258,7 +459,47 @@ function Analytics({ userId }) {
         </div>
       </div>
 
-      {/* ── Section 5: Achievements ───────────────────────────────────────── */}
+      {/* ── Section 5: AI Feedback Summary ───────────────────────────────── */}
+      {(analytics.aiSessions > 0 || analytics.selfMarkSessions > 0) && (
+        <div className="an-card an-card--full">
+          <h2 className="an-card-title">🤖 AI Feedback Summary</h2>
+          <p className="an-card-subtitle">How you're using AI-powered answer evaluation</p>
+          <div className="an-ai-summary">
+            <div className="an-ai-stat">
+              <div className="an-ai-stat-value">{analytics.aiSessions}</div>
+              <div className="an-ai-stat-label">AI-evaluated sessions</div>
+              {analytics.avgAIScore > 0 && (
+                <div className="an-ai-stat-avg">avg {analytics.avgAIScore}%</div>
+              )}
+            </div>
+            <div className="an-ai-divider" />
+            <div className="an-ai-stat">
+              <div className="an-ai-stat-value">{analytics.selfMarkSessions}</div>
+              <div className="an-ai-stat-label">Self-marked sessions</div>
+              {analytics.avgSelfMarkScore > 0 && (
+                <div className="an-ai-stat-avg">avg {analytics.avgSelfMarkScore}%</div>
+              )}
+            </div>
+            {analytics.aiSessions > 0 && analytics.selfMarkSessions > 0 && (
+              <>
+                <div className="an-ai-divider" />
+                <div className="an-ai-stat">
+                  <div
+                    className="an-ai-stat-value"
+                    style={{ color: analytics.avgAIScore >= analytics.avgSelfMarkScore ? '#4caf50' : '#ff9800' }}
+                  >
+                    {analytics.avgAIScore >= analytics.avgSelfMarkScore ? '+' : ''}
+                    {Math.round(analytics.avgAIScore - analytics.avgSelfMarkScore)}%
+                  </div>
+                  <div className="an-ai-stat-label">AI vs self-mark difference</div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Section 6: Achievements ───────────────────────────────────────── */}
       <div className="an-card an-card--full">
         <h2 className="an-card-title">🏆 Achievements</h2>
         {anyBadgeEarned ? (
