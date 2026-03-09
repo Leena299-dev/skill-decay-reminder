@@ -1,0 +1,1 @@
+{"userId":{"S":"demo-user-sharpedge-001"},"email":{"S":"demo@sharpedge.app"},"name":{"S":"Alex Johnson"},"streak":{"N":"7"},"isNewUser":{"BOOL":false},"createdAt":{"S":"2026-03-08T10:00:00.000000+00:00"}}

@@ -13,6 +13,15 @@ export const signIn = async (email) => {
   }
 };
 
+export const updateUser = async (userId, data) => {
+  try {
+    const response = await axios.put(`${API_URL}/users`, { userId, ...data });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
 export const registerUser = async (email, name, timezone = 'UTC') => {
   try {
     const response = await axios.post(`${API_URL}/users`, {

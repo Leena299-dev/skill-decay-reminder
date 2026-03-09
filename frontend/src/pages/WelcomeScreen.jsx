@@ -15,7 +15,7 @@ function Brand() {
   );
 }
 
-function WelcomeScreen({ email, userId, userName, onRegistered, onReady, onBack }) {
+function WelcomeScreen({ email, userId, userName, isNewUser, onRegistered, onReady, onBack }) {
   // Phase 1 state
   const [name, setName] = useState('');
   const [regLoading, setRegLoading] = useState(false);
@@ -125,15 +125,21 @@ function WelcomeScreen({ email, userId, userName, onRegistered, onReady, onBack 
 
   // ── Phase 2: Skill form ────────────────────────────────────────────────────
   if (showSkillForm) {
+    const phase2Title = addedSkills.length === 0
+      ? (isNewUser ? `Welcome, ${displayName}! 👋` : `Welcome back, ${displayName}! 👋`)
+      : 'Add another skill';
+    const phase2Subtitle = addedSkills.length === 0
+      ? (isNewUser
+          ? "Let's get started — add your first skill below to begin tracking your knowledge."
+          : "Good to see you again. Ready to keep your skills sharp?")
+      : null;
+
     return (
       <div className="welcome-screen">
         <div className="welcome-card welcome-card--wide">
           <Brand />
-          <h1 className="welcome-title">
-            {addedSkills.length === 0
-              ? `Let's add your first skill, ${displayName}!`
-              : 'Add another skill'}
-          </h1>
+          <h1 className="welcome-title">{phase2Title}</h1>
+          {phase2Subtitle && <p className="welcome-subtitle-text">{phase2Subtitle}</p>}
           <form className="welcome-form" onSubmit={handleAddSkill}>
             <label className="welcome-label">Skill Name</label>
             <input
@@ -213,6 +219,29 @@ function WelcomeScreen({ email, userId, userName, onRegistered, onReady, onBack 
   }
 
   // ── Phase 3: Confirmation ──────────────────────────────────────────────────
+
+  // Returning user (isNewUser=false) who signed in with flag still set —
+  // they haven't added any skills this session, so show a clean welcome-back screen.
+  if (!isNewUser && addedSkills.length === 0) {
+    return (
+      <div className="welcome-screen">
+        <div className="welcome-card welcome-card--wide">
+          <Brand />
+          <h1 className="welcome-title">Welcome back, {displayName}! 👋</h1>
+          <p className="welcome-subtitle-text">Good to see you again. Ready to keep your skills sharp?</p>
+          <div className="welcome-actions welcome-actions--stacked">
+            <button className="welcome-cta-btn" onClick={onReady}>
+              Go to My Dashboard →
+            </button>
+            <button className="welcome-secondary-btn" onClick={() => setShowSkillForm(true)}>
+              + Add a New Skill
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="welcome-screen">
       <div className="welcome-card welcome-card--wide">
